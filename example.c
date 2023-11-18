@@ -35,14 +35,60 @@ static uint32_t pixels[HEIGHT * WIDTH];
 #define FG_COLOR 0x000000FF
 
 bool corners_example(void) {
+  // initialize buffer with bg color
   pastel_fill(pixels, WIDTH, HEIGHT, BG_COLOR);
   pastel_fill_rect(pixels, WIDTH, HEIGHT, 0, 0, 10, 10, FG_COLOR);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, 0, WIDTH - 10, 10, 10, FG_COLOR);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, HEIGHT - 10, 0, 10, 10, FG_COLOR);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, (HEIGHT - 10) / 2, (WIDTH - 10) / 2, 10, 10, FG_COLOR);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, HEIGHT - 10, WIDTH - 10, 10, 10, FG_COLOR);
+  pastel_fill_rect(pixels, WIDTH, HEIGHT, 0, HEIGHT - 10, 10, 10, FG_COLOR);
+  pastel_fill_rect(pixels, WIDTH, HEIGHT, WIDTH - 10, 0, 10, 10, FG_COLOR);
+  pastel_fill_rect(pixels, WIDTH, HEIGHT, (WIDTH - 10) / 2, (HEIGHT - 10) / 2, 10, 10, FG_COLOR);
+  pastel_fill_rect(pixels, WIDTH, HEIGHT, WIDTH - 10, HEIGHT - 10, 10, 10, FG_COLOR);
 
-  const char* file_path = "./outputs/corners.ppm";
+  const char* file_path = "./outputs/corners_examples.ppm";
+  Errno err = pastel_write_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
+  if (err) {
+      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
+      return false;
+  }
+  return true;
+}
+
+bool checker_example(void) {
+  // initialize buffer with bg color
+  pastel_fill(pixels, WIDTH, HEIGHT, BG_COLOR);
+
+  size_t cols = 10;
+  size_t rect_width = WIDTH / cols;
+  size_t rows = 8;
+  size_t rect_height = HEIGHT / rows;
+  // Pixel at col m, row n is at pos (m * WIDTH/cols, n * HEIGHT/rows)
+
+  for (size_t n = 0; n < rows; ++n) {
+    size_t m = 0;
+    if (n % 2 == 1) { m = 1; }
+
+    size_t i0 = n * (HEIGHT / rows);
+    for (; m < cols; m += 2) {
+      size_t j0 = m * (WIDTH / cols);
+      pastel_fill_rect(pixels, WIDTH, HEIGHT, j0, i0,
+                       rect_width, rect_height, FG_COLOR);
+    }
+  }
+
+  const char* file_path = "./outputs/checker_example.ppm";
+  Errno err = pastel_write_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
+  if (err) {
+      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
+      return false;
+  }
+  return true;
+}
+
+bool circle_example(void) {
+  // initialize buffer with bg color
+  pastel_fill(pixels, WIDTH, HEIGHT, BG_COLOR);
+
+  pastel_fill_circle(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT / 2, 10, FG_COLOR);
+  const char* file_path = "./outputs/circle_example.ppm";
   Errno err = pastel_write_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
   if (err) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
@@ -53,5 +99,7 @@ bool corners_example(void) {
 
 int main (void) {
   corners_example();
+  checker_example();
+  circle_example();
   return 0;
 }

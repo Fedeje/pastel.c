@@ -78,17 +78,42 @@ void pastel_fill(uint32_t* pixels,
 
 //
 // Fill a rectangle with a given color.
-// A rectangle starts at pixel (x0, y0) and has a width and a height.
+// A rectangle starts at pixel (i0, j0) and has a width and a height.
 void pastel_fill_rect(uint32_t* pixels,
                       size_t pixels_width, size_t pixels_height,
-                      int i0, int j0, // a rectangle can start at "negative" pixels
+                      int j0, int i0,
                       size_t rect_width, size_t rect_height, uint32_t color) {
   // A pixel image is row-major
-  for (size_t i = i0; i < i0 + rect_height; ++i) {
-    if (0 <= i && i < pixels_height) {
-      for (size_t j = j0; j < j0 + rect_width; ++j) {
-        if (0 <= j && j < pixels_width) {
+  for (int i = i0; i < i0 + (int)rect_height; ++i) {
+    if (0 <= i && i < (int)pixels_height) {
+      for (int j = j0; j < j0 + (int)rect_width; ++j) {
+        if (0 <= j && j < (int)pixels_width) {
         pixels[i * pixels_width + j] = color;
+        }
+      }
+    }
+  }
+}
+
+//
+// Fill a circle with a given color.
+// A circle has center (i0, j0) and radius r.
+void pastel_fill_circle(uint32_t* pixels,
+                        size_t pixels_width, size_t pixels_height,
+                        int j0, int i0,
+                        size_t r, uint32_t color) {
+  int i0_aabb = i0 - r;
+  int j0_aabb = j0 - r;
+  int r2 = (int)(r * r);
+  for (int i = i0_aabb; i < i0_aabb + 2 * (int)r; ++i) {
+    if (0 <= i && i < (int)pixels_height) {
+      int dist_to_center_x2 = (i - i0) * (i - i0);
+      for (int j = j0_aabb; j < j0_aabb + 2 * (int)r; ++j) {
+        if (0 <= j && j < (int)pixels_width) {
+          int dist_to_center_y2 = (j - j0) * (j - j0);
+          if ((dist_to_center_x2 + dist_to_center_y2) <= r2) {
+            pixels[i * pixels_width + j] = color;
+          }
         }
       }
     }
