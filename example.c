@@ -62,14 +62,14 @@ bool checker_example(void) {
   size_t rect_height = HEIGHT / rows;
   // Pixel at col m, row n is at pos (m * WIDTH/cols, n * HEIGHT/rows)
 
-  for (size_t n = 0; n < rows; ++n) {
-    size_t m = 0;
-    if (n % 2 == 1) { m = 1; }
+  for (size_t i = 0; i < rows; ++i) {
+    size_t j = 0;
+    if (i % 2 == 1) { j = 1; }
 
-    size_t i0 = n * (HEIGHT / rows);
-    for (; m < cols; m += 2) {
-      size_t j0 = m * (WIDTH / cols);
-      pastel_fill_rect(pixels, WIDTH, HEIGHT, j0, i0,
+    size_t y0 = i * (HEIGHT / rows);
+    for (; j < cols; j += 2) {
+      size_t x0 = j * (WIDTH / cols);
+      pastel_fill_rect(pixels, WIDTH, HEIGHT, x0, y0,
                        rect_width, rect_height, FG_COLOR);
     }
   }
@@ -87,7 +87,7 @@ bool circle_example(void) {
   // initialize buffer with bg color
   pastel_fill(pixels, WIDTH, HEIGHT, BG_COLOR);
 
-  pastel_fill_circle(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT / 2, 10, FG_COLOR);
+  pastel_fill_circle(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT / 2, 25, FG_COLOR);
   const char* file_path = "./outputs/circle_example.ppm";
   Errno err = pastel_write_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
   if (err) {

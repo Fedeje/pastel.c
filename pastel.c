@@ -81,14 +81,14 @@ void pastel_fill(uint32_t* pixels,
 // A rectangle starts at pixel (i0, j0) and has a width and a height.
 void pastel_fill_rect(uint32_t* pixels,
                       size_t pixels_width, size_t pixels_height,
-                      int j0, int i0,
+                      int x0, int y0,
                       size_t rect_width, size_t rect_height, uint32_t color) {
   // A pixel image is row-major
-  for (int i = i0; i < i0 + (int)rect_height; ++i) {
-    if (0 <= i && i < (int)pixels_height) {
-      for (int j = j0; j < j0 + (int)rect_width; ++j) {
-        if (0 <= j && j < (int)pixels_width) {
-        pixels[i * pixels_width + j] = color;
+  for (int y = y0; y < y0 + (int)rect_height; ++y) {
+    if (0 <= y && y < (int)pixels_height) {
+      for (int x = x0; x < x0 + (int)rect_width; ++x) {
+        if (0 <= x && x < (int)pixels_width) {
+        pixels[y * pixels_width + x] = color;
         }
       }
     }
@@ -100,19 +100,19 @@ void pastel_fill_rect(uint32_t* pixels,
 // A circle has center (i0, j0) and radius r.
 void pastel_fill_circle(uint32_t* pixels,
                         size_t pixels_width, size_t pixels_height,
-                        int j0, int i0,
+                        int y0, int x0,
                         size_t r, uint32_t color) {
-  int i0_aabb = i0 - r;
-  int j0_aabb = j0 - r;
+  int x0_aabb = x0 - r;
+  int y0_aabb = y0 - r;
   int r2 = (int)(r * r);
-  for (int i = i0_aabb; i < i0_aabb + 2 * (int)r; ++i) {
-    if (0 <= i && i < (int)pixels_height) {
-      int dist_to_center_x2 = (i - i0) * (i - i0);
-      for (int j = j0_aabb; j < j0_aabb + 2 * (int)r; ++j) {
-        if (0 <= j && j < (int)pixels_width) {
-          int dist_to_center_y2 = (j - j0) * (j - j0);
+  for (int x = x0_aabb; x < x0_aabb + 2 * (int)r; ++x) {
+    if (0 <= x && x < (int)pixels_height) {
+      int dist_to_center_x2 = (x - x0) * (x - x0);
+      for (int y = y0_aabb; y < y0_aabb + 2 * (int)r; ++y) {
+        if (0 <= y && y < (int)pixels_width) {
+          int dist_to_center_y2 = (y - y0) * (y - y0);
           if ((dist_to_center_x2 + dist_to_center_y2) <= r2) {
-            pixels[i * pixels_width + j] = color;
+            pixels[x * pixels_width + y] = color;
           }
         }
       }
