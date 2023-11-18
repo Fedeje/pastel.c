@@ -31,6 +31,7 @@ static uint32_t pixels[HEIGHT * WIDTH];
 // If it's not static and is defined at function scope, it's going to be
 // on the stack.
 
+#define IMGS_DIR_PATH "./imgs"
 #define BG_COLOR 0x00000000
 #define FG_COLOR 0x000000FF
 
@@ -43,7 +44,7 @@ bool corners_example(void) {
   pastel_fill_rect(pixels, WIDTH, HEIGHT, (WIDTH - 10) / 2, (HEIGHT - 10) / 2, 10, 10, FG_COLOR);
   pastel_fill_rect(pixels, WIDTH, HEIGHT, WIDTH - 10, HEIGHT - 10, 10, 10, FG_COLOR);
 
-  const char* file_path = "./outputs/corners_examples.ppm";
+  const char* file_path = IMGS_DIR_PATH"/corners_examples.ppm";
   Errno err = pastel_write_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
   if (err) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
@@ -74,7 +75,7 @@ bool checker_example(void) {
     }
   }
 
-  const char* file_path = "./outputs/checker_example.ppm";
+  const char* file_path = IMGS_DIR_PATH"/checker_example.ppm";
   Errno err = pastel_write_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
   if (err) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
@@ -88,7 +89,7 @@ bool circle_example(void) {
   pastel_fill(pixels, WIDTH, HEIGHT, BG_COLOR);
 
   pastel_fill_circle(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT / 2, 25, FG_COLOR);
-  const char* file_path = "./outputs/circle_example.ppm";
+  const char* file_path = IMGS_DIR_PATH"/circle_example.ppm";
   Errno err = pastel_write_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
   if (err) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
@@ -98,8 +99,8 @@ bool circle_example(void) {
 }
 
 int main (void) {
-  corners_example();
-  checker_example();
-  circle_example();
+  if (!corners_example()) return -1;
+  if (!checker_example()) return -1;
+  if (!circle_example()) return -1;
   return 0;
 }
