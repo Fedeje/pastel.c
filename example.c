@@ -15,6 +15,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include "pastel.c"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "third-party/stb_image_write.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -32,8 +34,9 @@ static uint32_t pixels[HEIGHT * WIDTH];
 // on the stack.
 
 #define IMGS_DIR_PATH "./imgs"
-#define BG_COLOR 0x00000000
-#define FG_COLOR 0x000000FF
+// Hex color: 0xAABBGGRR
+#define BG_COLOR 0xFFFF0000
+#define FG_COLOR 0xFF0000FF
 
 bool corners_example(void) {
   // initialize buffer with bg color
@@ -44,9 +47,9 @@ bool corners_example(void) {
   pastel_fill_rect(pixels, WIDTH, HEIGHT, (WIDTH - 10) / 2, (HEIGHT - 10) / 2, 10, 10, FG_COLOR);
   pastel_fill_rect(pixels, WIDTH, HEIGHT, WIDTH - 10, HEIGHT - 10, 10, 10, FG_COLOR);
 
-  const char* file_path = IMGS_DIR_PATH"/corners_examples.ppm";
-  Errno err = pastel_write_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
-  if (err) {
+  const char* file_path = IMGS_DIR_PATH"/corners_examples.png";
+  printf("Generated image %s\n", file_path);
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH*sizeof(uint32_t))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -75,9 +78,9 @@ bool checker_example(void) {
     }
   }
 
-  const char* file_path = IMGS_DIR_PATH"/checker_example.ppm";
-  Errno err = pastel_write_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
-  if (err) {
+  const char* file_path = IMGS_DIR_PATH"/checker_example.png";
+  printf("Generated image %s\n", file_path);
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH*sizeof(uint32_t))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -89,9 +92,9 @@ bool circle_example(void) {
   pastel_fill(pixels, WIDTH, HEIGHT, BG_COLOR);
 
   pastel_fill_circle(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT / 2, 25, FG_COLOR);
-  const char* file_path = IMGS_DIR_PATH"/circle_example.ppm";
-  Errno err = pastel_write_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
-  if (err) {
+  const char* file_path = IMGS_DIR_PATH"/circle_example.png";
+  printf("Generated image %s\n", file_path);
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH*sizeof(uint32_t))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
