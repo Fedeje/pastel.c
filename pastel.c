@@ -7,8 +7,9 @@
 // Here, we'll mainly focus on step 1, but if we have time, we'll
 // also take a look at step 2.
 // 
-// Goal: render a triangle and send it to the std output, following a
-// .ppm format style.
+// TODO: draw_line
+// TODO: super-sampling for lines
+// TODO: fill_triangle
 // 
 
 #define PASTEL_RED   0xFF5472E8
@@ -63,7 +64,6 @@ Errno pastel_write_to_ppm_file(uint32_t* pixels, // const is useless
     } // for loop
   } // body of function
 
-
 defer: // this is a label you can "goto"
   if (f) fclose(f);
   return result;
@@ -80,7 +80,6 @@ void pastel_fill(uint32_t* pixels,
   }
 } // function `void pastel_fill`
 
-
 //
 // Fill a rectangle with a given color.
 // A rectangle starts at pixel (x0, y0) and has a width and a height.
@@ -89,9 +88,9 @@ void pastel_fill_rect(uint32_t* pixels,
                       int x0, int y0,
                       size_t rect_width, size_t rect_height, uint32_t color) {
   // A pixel image is row-major
-  for (int y = y0; y < y0 + (int)rect_height; ++y) {
+  for (int y = y0; y <= y0 + (int)rect_height; ++y) {
     if (0 <= y && y < (int)pixels_height) {
-      for (int x = x0; x < x0 + (int)rect_width; ++x) {
+      for (int x = x0; x <= x0 + (int)rect_width; ++x) {
         if (0 <= x && x < (int)pixels_width) {
         pixels[y * pixels_width + x] = color;
         }
@@ -110,10 +109,10 @@ void pastel_fill_circle(uint32_t* pixels,
   int x0_aabb = x0 - r;
   int y0_aabb = y0 - r;
   int r2 = (int)(r * r);
-  for (int y = y0_aabb; y < y0_aabb + 2 * (int)r; ++y) {
+  for (int y = y0_aabb; y <= y0_aabb + 2 * (int)r; ++y) {
     if (0 <= y && y < (int)pixels_height) {
       int dist_to_center_y2 = (y - y0) * (y - y0);
-      for (int x = x0_aabb; x < x0_aabb + 2 * (int)r; ++x) {
+      for (int x = x0_aabb; x <= x0_aabb + 2 * (int)r; ++x) {
         if (0 <= x && x < (int)pixels_width) {
           int dist_to_center_x2 = (x - x0) * (x - x0);
           if ((dist_to_center_x2 + dist_to_center_y2) <= r2) {
@@ -124,5 +123,29 @@ void pastel_fill_circle(uint32_t* pixels,
     }
   }
 }
+
+//
+// Draw a line with a given color.
+// A line starts at (x0, y0) and ends at (x1, y1).
+#if 0
+void pastel_draw_line(uint32_t* pixels,
+                        size_t pixels_width, size_t pixels_height,
+                        int x0, int y0, int x1, int y1, uint32_t color) {
+  int delta_x = x0 - x1;
+  int delta_y = y0 - y1;
+
+  if (delta_x == 0) {
+    // Vertical line
+    int increment = (y0 < y1 ? 1 : -1);
+    for (int y = y0; y <= y1; y += increment) {
+
+    }
+  } else {
+    float slope = ((float)delta_y) / ((float)delta_y);
+
+  }
+
+}
+#endif
 
 #endif // PASTEL_C_

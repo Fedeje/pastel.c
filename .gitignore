@@ -1,4 +1,4 @@
 bin/
 imgs/
 *.ppm
-test/diff_*
+test/diff/

@@ -4,6 +4,6 @@ run TARGET: (compile)
 compile:
     mkdir -p ./bin/
     mkdir -p ./imgs/
-    mkdir -p ./test/
+    mkdir -p ./test/diff
     clang example.c -Wall -Wextra -std=c99 -o ./bin/example
     clang test.c -Wall -Wextra -std=c99 -o ./bin/test

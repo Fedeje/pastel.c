@@ -13,6 +13,7 @@
 #include "third-party/stb_image.h"
 
 #define TEST_DIR_PATH "./test"
+#define TEST_DIFF_DIR_PATH TEST_DIR_PATH"/diff"
 
 #define UNIMPLEMENTED(message) \
   do { \
@@ -92,7 +93,7 @@ typedef struct {
   { \
   .run = name, \
   .file_path = TEST_DIR_PATH "/" #name ".png", \
-  .diff_file_path = TEST_DIR_PATH "/diff_" #name ".png", \
+  .diff_file_path = TEST_DIFF_DIR_PATH "/diff_" #name ".png", \
   }
 
 void test_fill_rect(void) {
