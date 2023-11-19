@@ -11,6 +11,11 @@
 // .ppm format style.
 // 
 
+#define PASTEL_RED   0xFF5472E8
+#define PASTEL_GREEN 0xFF79E854
+#define PASTEL_BLUE  0xFFE86056
+#define PASTEL_BLACK 0xFF3A3C45
+
 #include <stdint.h>
 #include <stdio.h>
 #include <errno.h>
@@ -78,7 +83,7 @@ void pastel_fill(uint32_t* pixels,
 
 //
 // Fill a rectangle with a given color.
-// A rectangle starts at pixel (i0, j0) and has a width and a height.
+// A rectangle starts at pixel (x0, y0) and has a width and a height.
 void pastel_fill_rect(uint32_t* pixels,
                       size_t pixels_width, size_t pixels_height,
                       int x0, int y0,
@@ -97,22 +102,22 @@ void pastel_fill_rect(uint32_t* pixels,
 
 //
 // Fill a circle with a given color.
-// A circle has center (i0, j0) and radius r.
+// A circle has center (x0, y0) and radius r.
 void pastel_fill_circle(uint32_t* pixels,
                         size_t pixels_width, size_t pixels_height,
-                        int y0, int x0,
+                        int x0, int y0,
                         size_t r, uint32_t color) {
   int x0_aabb = x0 - r;
   int y0_aabb = y0 - r;
   int r2 = (int)(r * r);
-  for (int x = x0_aabb; x < x0_aabb + 2 * (int)r; ++x) {
-    if (0 <= x && x < (int)pixels_height) {
-      int dist_to_center_x2 = (x - x0) * (x - x0);
-      for (int y = y0_aabb; y < y0_aabb + 2 * (int)r; ++y) {
-        if (0 <= y && y < (int)pixels_width) {
-          int dist_to_center_y2 = (y - y0) * (y - y0);
+  for (int y = y0_aabb; y < y0_aabb + 2 * (int)r; ++y) {
+    if (0 <= y && y < (int)pixels_height) {
+      int dist_to_center_y2 = (y - y0) * (y - y0);
+      for (int x = x0_aabb; x < x0_aabb + 2 * (int)r; ++x) {
+        if (0 <= x && x < (int)pixels_width) {
+          int dist_to_center_x2 = (x - x0) * (x - x0);
           if ((dist_to_center_x2 + dist_to_center_y2) <= r2) {
-            pixels[x * pixels_width + y] = color;
+            pixels[y * pixels_width + x] = color;
           }
         }
       }

@@ -35,8 +35,8 @@ static uint32_t pixels[HEIGHT * WIDTH];
 
 #define IMGS_DIR_PATH "./imgs"
 // Hex color: 0xAABBGGRR
-#define BG_COLOR 0xFFFF0000
-#define FG_COLOR 0xFF0000FF
+#define BG_COLOR PASTEL_BLACK
+#define FG_COLOR PASTEL_RED
 
 bool corners_example(void) {
   // initialize buffer with bg color
