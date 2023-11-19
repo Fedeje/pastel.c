@@ -27,7 +27,7 @@
 // Returning errno is standard a way to catch errors.
 typedef int Errno;
 #define return_defer(value) do { result = (value); goto defer; } while (0)
-
+#define PASTEL_SWAP(T, val1, val2) do { T tmp = val1; val1 = val2; val2 = tmp; } while (0)
 
 //
 // Save an image to ppm format
@@ -127,25 +127,53 @@ void pastel_fill_circle(uint32_t* pixels,
 //
 // Draw a line with a given color.
 // A line starts at (x0, y0) and ends at (x1, y1).
-#if 0
 void pastel_draw_line(uint32_t* pixels,
                         size_t pixels_width, size_t pixels_height,
                         int x0, int y0, int x1, int y1, uint32_t color) {
-  int delta_x = x0 - x1;
-  int delta_y = y0 - y1;
-
-  if (delta_x == 0) {
+  if (x0 == x1) {
     // Vertical line
-    int increment = (y0 < y1 ? 1 : -1);
-    for (int y = y0; y <= y1; y += increment) {
-
+    if (0 <= x0 && x0 < (int)pixels_width) {
+      if (y0 > y1) PASTEL_SWAP(int, y0, y1);
+      for (int y = y0; y <= y1; ++y) {
+        pixels[y * pixels_width + x0] = color;
+      }
+    }
+  } else if (y0 == y1) {
+    // Horizontal line
+    if (0 <= y0 && y0 < (int)pixels_height) {
+      if (x0 > x1) PASTEL_SWAP(int, x0, x1);
+      for (int x = x0; x <= x1; ++x) {
+        pixels[y0 * pixels_width + x] = color;
+      }
     }
   } else {
-    float slope = ((float)delta_y) / ((float)delta_y);
-
+    if (x0 > x1) {
+      PASTEL_SWAP(int, x0, x1);
+      PASTEL_SWAP(int, y0, y1);
+    }
+    // So, there is an "issue" with using int.
+    // If we simply increment y by the float slope, since it can be < 1,
+    // the casting of the slope to int will resolve to 0.
+    // One solution is to truncate to nearest int, but this is costly for the CPU
+    // as it means branching.
+    // Solution which minimizes branching (best would be to benchmark tbh):
+    int dx = x0 - x1;
+    int dy = y0 - y1;
+    int offset = y0 - (dy*x0)/dx;
+    // float slope = ((float)dy) / ((float)dx);
+    for (int x = x0; x <= x1; ++x) {
+      if (0 <= x && x < (int)pixels_width) {
+        int ystart = (dy*x)/dx + offset;
+        int yend = (dy*(x+1))/dx + offset;
+        if (ystart > yend) PASTEL_SWAP(int, ystart, yend);
+        for(int y = ystart; y <= yend; ++y) {
+          if (0 <= y && y < (int)pixels_height) {
+            pixels[y * pixels_width + x] = color;
+          }
+        }
+      }
+    }
   }
-
 }
-#endif
 
 #endif // PASTEL_C_

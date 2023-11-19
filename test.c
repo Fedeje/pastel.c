@@ -110,9 +110,23 @@ void test_fill_circle(void) {
   pastel_fill_circle(pixels, WIDTH, HEIGHT, WIDTH, HEIGHT, 60, PASTEL_BLUE);
 }
 
+void test_draw_line(void) {
+  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
+  // Side lines
+  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, 0, 0, HEIGHT-1, PASTEL_RED);
+  pastel_draw_line(pixels, WIDTH, HEIGHT, WIDTH-1, 0, WIDTH-1, HEIGHT-1, PASTEL_RED);
+  // Middle lines
+  pastel_draw_line(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, PASTEL_GREEN);
+  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT / 2, WIDTH-1, HEIGHT / 2, PASTEL_GREEN);
+  // Diagonal lines
+  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, 0, WIDTH-1, HEIGHT-1, PASTEL_BLUE);
+  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT-1, WIDTH-1, 0, PASTEL_BLUE);
+}
+
 TestCase test_cases[] = {
   DEFINE_TEST_CASE(test_fill_rect),
   DEFINE_TEST_CASE(test_fill_circle),
+  DEFINE_TEST_CASE(test_draw_line),
 };
 
 #define TESTS_CASES_COUNT (sizeof(test_cases) / sizeof(test_cases[0]))

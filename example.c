@@ -101,9 +101,31 @@ bool circle_example(void) {
   return true;
 }
 
+bool line_example(void) {
+  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
+  // Side lines
+  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, 0, 0, HEIGHT-1, PASTEL_RED);
+  pastel_draw_line(pixels, WIDTH, HEIGHT, WIDTH-1, 0, WIDTH-1, HEIGHT-1, PASTEL_RED);
+  // Middle lines
+  pastel_draw_line(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, PASTEL_GREEN);
+  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT / 2, WIDTH-1, HEIGHT / 2, PASTEL_GREEN);
+  // Diagonal lines
+  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, 0, WIDTH-1, HEIGHT-1, PASTEL_BLUE);
+  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT-1, WIDTH-1, 0, PASTEL_BLUE);
+
+  const char* file_path = IMGS_DIR_PATH"/line_example.png";
+  printf("Generated image %s\n", file_path);
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH*sizeof(uint32_t))) {
+      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
+      return false;
+  }
+  return true;
+}
+
 int main (void) {
   if (!corners_example()) return -1;
   if (!checker_example()) return -1;
   if (!circle_example()) return -1;
+  if (!line_example()) return -1;
   return 0;
 }
