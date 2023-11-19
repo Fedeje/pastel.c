@@ -153,7 +153,8 @@ void pastel_draw_line(uint32_t* pixels,
     }
     // So, there is an "issue" with using int.
     // If we simply increment y by the float slope, since it can be < 1,
-    // the casting of the slope to int will resolve to 0.
+    // the casting of the slope to int will resolve to 0 and we would
+    // never increment y.
     // One solution is to truncate to nearest int, but this is costly for the CPU
     // as it means branching.
     // Solution which minimizes branching (best would be to benchmark tbh):
