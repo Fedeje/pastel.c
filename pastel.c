@@ -18,6 +18,7 @@
 #define PASTEL_BLACK 0xFF3A3C45
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <errno.h>
 
@@ -28,6 +29,8 @@
 typedef int Errno;
 #define return_defer(value) do { result = (value); goto defer; } while (0)
 #define PASTEL_SWAP(T, val1, val2) do { T tmp = val1; val1 = val2; val2 = tmp; } while (0)
+#define PASTEL_SIGN(T, x) ((T)((x) > 0) - (T)((x) < 0))
+#define PASTEL_ABS(T, x) (PASTEL_SIGN(T, x) * (x))
 
 //
 // Save an image to ppm format
@@ -176,5 +179,73 @@ void pastel_draw_line(uint32_t* pixels,
     }
   }
 }
+
+//
+// Draw a line with a given color.
+// A line starts at (x0, y0) and ends at (x1, y1).
+// NOTE: this code is not faster than the one above.
+void pastel_draw_line2(uint32_t* pixels,
+                        size_t pixels_width, size_t pixels_height,
+                        int x0, int y0, int x1, int y1, uint32_t color) {
+  bool steep = false;
+  if (PASTEL_ABS(int, x0 - x1) < PASTEL_ABS(int, y0 - y1)) {
+    // The line is too steep meaning an increment of x will lead
+    // to multiple increments in y.
+    // We want to fallback to the case where an increment of x can
+    // only lead to at most one increment of y.
+    // This is only the case when slope < 1.
+    // Thus We transpose the line <=> slope = 1 / slope.
+    PASTEL_SWAP(int, x0, y0);
+    PASTEL_SWAP(int, x1, y1);
+    steep = true;
+  }
+
+  if (x0 > x1) {
+    PASTEL_SWAP(int, x0, x1);
+    PASTEL_SWAP(int, y0, y1);
+  }
+
+  // When do we increment y?
+  // When the error between currently drawn line and "real" line
+  // is greater than one pixel, we increment y.
+  int dx = x1 - x0;
+  int dy = y1 - y0;
+  int y = y0;
+  int error = 0;
+  // float error_increment = PASTEL_ABS(int, dy/dx);
+  // we then compare the error to 0.5 (middle btw 0 and 1)
+  // to see if we increment y.
+  // To remove floats, we multiply everything by 2*dx
+  int error_increment = PASTEL_ABS(int, dy) * 2;
+  for (int x = x0; x <= x1; ++x) {
+    // Draw pixel
+    if (steep) {
+      if (0 <= x0 && x < (int) pixels_height && 0 <= y0 && y < (int) pixels_width) {
+        pixels[x * pixels_width + y] = color;
+      }
+    } else {
+      if (0 <= x0 && x < (int) pixels_width && 0 <= y0 && y < (int) pixels_height) {
+        pixels[y * pixels_width + x] = color;
+      }
+    }
+    // Increment y if needed
+    error += error_increment;
+    if (error > dx) {
+      y += (y1 > y0 ? 1 : -1);
+      error -= dx * 2;
+    }
+  }
+}
+
+//
+// Fill a triangle with a given color.
+// A triangle is 3 points (x0, y0), (x1, y1) and (x2, y2)
+#if 0
+void pastel_fill_triangle(uint32_t* pixels,
+                          size_t pixels_width, size_t pixels_height,
+                          int x0, int y0, int x1, int y1, int x2, int y2,
+                          uint32_t color) {
+}
+#endif
 
 #endif // PASTEL_C_
