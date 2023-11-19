@@ -21,8 +21,8 @@
   } while (0)
 #define return_defer(value) do { result = (value); goto defer; } while (0)
 
+#define WIDTH  160
 #define HEIGHT 120
-#define WIDTH  120
 static uint32_t pixels[HEIGHT * WIDTH];
 #define PIXEL_DIFF_COLOR 0xFFC934EB
 
@@ -97,10 +97,11 @@ typedef struct {
 
 void test_fill_rect(void) {
   pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, 0, 0, 40, 40, PASTEL_BLUE);
+  pastel_fill_rect(pixels, WIDTH, HEIGHT, 0, 0, 80, 40, PASTEL_BLUE);
   pastel_fill_rect(pixels, WIDTH, HEIGHT, WIDTH - 60, HEIGHT - 60, 60, 60, PASTEL_RED);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, (WIDTH - 40) / 2, (HEIGHT - 40) / 2, 40, 40, PASTEL_GREEN);
+  pastel_fill_rect(pixels, WIDTH, HEIGHT, (WIDTH - 60) / 2, (HEIGHT - 60) / 2, 80, 60, PASTEL_GREEN);
 }
+
 void test_fill_circle(void) {
   pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
   pastel_fill_circle(pixels, WIDTH, HEIGHT, 0, 0, 40, PASTEL_RED);
