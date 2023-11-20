@@ -6,6 +6,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
+#include <errno.h>
+#define PASTEL_IMPLEMENTATION
 #include "pastel.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "third-party/stb_image_write.h"

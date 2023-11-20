@@ -19,9 +19,11 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <errno.h>
+#include <stddef.h>
 
+// ------------------------------------
+// -------------- MACROS --------------
+// ------------------------------------
 #define PASTEL_SWAP(T, val1, val2) do { T tmp = val1; val1 = val2; val2 = tmp; } while (0)
 #define PASTEL_SIGN(T, x) ((T)((x) > 0) - (T)((x) < 0))
 #define PASTEL_ABS(T, x) (PASTEL_SIGN(T, x) * (x))
@@ -30,23 +32,58 @@
 #define PASTEL_MAX2(max, x, y) do { max = x; if (max < y) max = y; } while (0)
 #define PASTEL_MAX3(max, x, y, z) do { max = x; if (max < y) max = y; if (max < z) max = z; } while (0)
 
+// --------------------------------------
+// -------------- STRUCTS ---------------
+// --------------------------------------
+
+// ----------------------------------------
+// -------------- FUNCTIONS ---------------
+// ----------------------------------------
+#ifndef PASTELDEF
+#define PASTELDEF static inline
+#endif
+
 //
 // Fill the entire image buffer with a given color.
-void pastel_fill(uint32_t* pixels,
-                 size_t pixels_width, size_t pixels_height,
-                 uint32_t color) {
+PASTELDEF void pastel_fill(uint32_t* pixels, size_t pixels_width, size_t pixels_height, uint32_t color);
+//
+// Fill a rectangle with a given color. A rectangle starts at pixel (x0, y0) and has a width and a height.
+PASTELDEF void pastel_fill_rect(uint32_t* pixels, size_t pixels_width, size_t pixels_height, int x0, int y0, size_t rect_width, size_t rect_height, uint32_t color);
+//
+// Fill a circle with a given color. A circle has center (x0, y0) and radius r.
+PASTELDEF void pastel_fill_circle(uint32_t* pixels, size_t pixels_width, size_t pixels_height, int x0, int y0, size_t r, uint32_t color);
+//
+// Draw a line with a given color. A line starts at (x0, y0) and ends at (x1, y1).
+PASTELDEF void pastel_draw_line(uint32_t* pixels, size_t pixels_width, size_t pixels_height, int x0, int y0, int x1, int y1, uint32_t color);
+PASTELDEF void pastel_draw_line2(uint32_t* pixels, size_t pixels_width, size_t pixels_height, int x0, int y0, int x1, int y1, uint32_t color);
+//
+// Fill a triangle with a given color. A triangle is 3 points (x0, y0), (x1, y1) and (x2, y2)
+// Convention: the triangles are stored counter-clockwise.
+PASTELDEF void pastel_fill_triangle2_oriented(uint32_t* pixels, size_t pixels_width, size_t pixels_height, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color);
+// Same as `pastel_fill_triangle_oriented` but the triangle does not need to have an orientation.
+PASTELDEF void pastel_fill_triangle2(uint32_t* pixels, size_t pixels_width, size_t pixels_height, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color);
+//
+// Fill a triangle with a given color. Instead of using aabb and checking if pixels are inside triangle, fill the triangle by drawing it line by line.
+// On the CPU, this version is MUCH faster than the AABB ones above (3x faster). However, in practice, on the GPU, it's the AABB one which is implemented.
+// This is simply because you can assign each pixel of the AABB to a GPU core. Parallelism changes a lot (benchmarking is very important).
+PASTELDEF void pastel_fill_triangle(uint32_t* pixels, size_t pixels_width, size_t pixels_height, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color);
+
+// -----------------------------------------------------
+// -------------- PASTEL IMPLEMENTATIONS ---------------
+// -----------------------------------------------------
+#ifdef PASTEL_IMPLEMENTATION
+PASTELDEF void pastel_fill(uint32_t* pixels,
+                           size_t pixels_width, size_t pixels_height,
+                           uint32_t color) {
   for (size_t i = 0; i < pixels_width * pixels_height; ++i) {
     pixels[i] = color;
   }
 } // function `void pastel_fill`
 
-//
-// Fill a rectangle with a given color.
-// A rectangle starts at pixel (x0, y0) and has a width and a height.
-void pastel_fill_rect(uint32_t* pixels,
-                      size_t pixels_width, size_t pixels_height,
-                      int x0, int y0,
-                      size_t rect_width, size_t rect_height, uint32_t color) {
+PASTELDEF void pastel_fill_rect(uint32_t* pixels,
+                                size_t pixels_width, size_t pixels_height,
+                                int x0, int y0,
+                                size_t rect_width, size_t rect_height, uint32_t color) {
   // A pixel image is row-major
   for (int y = y0; y <= y0 + (int)rect_height; ++y) {
     if (0 <= y && y < (int)pixels_height) {
@@ -59,13 +96,10 @@ void pastel_fill_rect(uint32_t* pixels,
   }
 }
 
-//
-// Fill a circle with a given color.
-// A circle has center (x0, y0) and radius r.
-void pastel_fill_circle(uint32_t* pixels,
-                        size_t pixels_width, size_t pixels_height,
-                        int x0, int y0,
-                        size_t r, uint32_t color) {
+PASTELDEF void pastel_fill_circle(uint32_t* pixels,
+                                  size_t pixels_width, size_t pixels_height,
+                                  int x0, int y0,
+                                  size_t r, uint32_t color) {
   int x0_aabb = x0 - r;
   int y0_aabb = y0 - r;
   int r2 = (int)(r * r);
@@ -84,12 +118,9 @@ void pastel_fill_circle(uint32_t* pixels,
   }
 }
 
-//
-// Draw a line with a given color.
-// A line starts at (x0, y0) and ends at (x1, y1).
-void pastel_draw_line(uint32_t* pixels,
-                        size_t pixels_width, size_t pixels_height,
-                        int x0, int y0, int x1, int y1, uint32_t color) {
+PASTELDEF void pastel_draw_line(uint32_t* pixels,
+                                size_t pixels_width, size_t pixels_height,
+                                int x0, int y0, int x1, int y1, uint32_t color) {
   if (x0 == x1) {
     // Vertical line
     if (0 <= x0 && x0 < (int)pixels_width) {
@@ -141,13 +172,10 @@ void pastel_draw_line(uint32_t* pixels,
   }
 }
 
-//
-// Draw a line with a given color.
-// A line starts at (x0, y0) and ends at (x1, y1).
-// NOTE: this code is not faster than the one above.
-void pastel_draw_line2(uint32_t* pixels,
-                        size_t pixels_width, size_t pixels_height,
-                        int x0, int y0, int x1, int y1, uint32_t color) {
+// NOTE: this code is not faster than `pastel_draw_line`.
+PASTELDEF void pastel_draw_line2(uint32_t* pixels,
+                                 size_t pixels_width, size_t pixels_height,
+                                 int x0, int y0, int x1, int y1, uint32_t color) {
   bool steep = false;
   if (PASTEL_ABS(int, x0 - x1) < PASTEL_ABS(int, y0 - y1)) {
     // The line is too steep meaning an increment of x will lead
@@ -198,9 +226,6 @@ void pastel_draw_line2(uint32_t* pixels,
   }
 }
 
-//
-// Fill a triangle with a given color.
-// A triangle is 3 points (x0, y0), (x1, y1) and (x2, y2)
 // Convention: the triangles are stored counter-clockwise.
 //
 //                  ^
@@ -215,10 +240,10 @@ void pastel_draw_line2(uint32_t* pixels,
 //       P1
 // The normals n point always outside the triangle, so the triangle goes as:
 // P2 - P0, P1 - P2 and P0 - P1
-void pastel_fill_triangle2_oriented(uint32_t* pixels,
-                                   size_t pixels_width, size_t pixels_height,
-                                   int x0, int y0, int x1, int y1, int x2, int y2,
-                                   uint32_t color) {
+PASTELDEF void pastel_fill_triangle2_oriented(uint32_t* pixels,
+                                              size_t pixels_width, size_t pixels_height,
+                                              int x0, int y0, int x1, int y1, int x2, int y2,
+                                              uint32_t color) {
   int aabb_x0, aabb_y0, aabb_x1, aabb_y1;
   PASTEL_MIN3(aabb_x0, x0, x1, x2);
   PASTEL_MIN3(aabb_y0, y0, y1, y2);
@@ -253,15 +278,12 @@ void pastel_fill_triangle2_oriented(uint32_t* pixels,
   }
 }
 
-
-//
-// Fill a triangle with a given color.
 // Same as `pastel_fill_triangle_oriented` but the triangle does not
-// need to have an orientation
-void pastel_fill_triangle2(uint32_t* pixels,
-                          size_t pixels_width, size_t pixels_height,
-                          int x0, int y0, int x1, int y1, int x2, int y2,
-                          uint32_t color) {
+// need to have an orientation.
+PASTELDEF void pastel_fill_triangle2(uint32_t* pixels,
+                                     size_t pixels_width, size_t pixels_height,
+                                     int x0, int y0, int x1, int y1, int x2, int y2,
+                                     uint32_t color) {
   int aabb_x0, aabb_y0, aabb_x1, aabb_y1;
   PASTEL_MIN3(aabb_x0, x0, x1, x2);
   PASTEL_MIN3(aabb_y0, y0, y1, y2);
@@ -289,19 +311,10 @@ void pastel_fill_triangle2(uint32_t* pixels,
   }
 }
 
-
-//
-// Fill a triangle with a given color.
-// Instead of using aabb and checking if pixels are inside triangle,
-// fill the triangle by drawing it line by line.
-// On the CPU, this version is MUCH faster than the AABB ones above (3x faster).
-// However, in practice, on the GPU, it's the AABB one which is implemented.
-// This is simply because you can assign each pixel of the AABB to a GPU core.
-// Parallelism changes a lot (benchmarking is very important).
-void pastel_fill_triangle(uint32_t* pixels,
-                          size_t pixels_width, size_t pixels_height,
-                          int x0, int y0, int x1, int y1, int x2, int y2,
-                          uint32_t color) {
+PASTELDEF void pastel_fill_triangle(uint32_t* pixels,
+                                    size_t pixels_width, size_t pixels_height,
+                                    int x0, int y0, int x1, int y1, int x2, int y2,
+                                    uint32_t color) {
   if ((y0 == y1 && y0 == y2) || (x0 == x1 && x0 == x2)) return; // degenerate triangle
 
   // Sort the vertices according to the y-axis
@@ -350,4 +363,5 @@ void pastel_fill_triangle(uint32_t* pixels,
   }
 }
 
+#endif // PASTEL_IMPLEMENTATION
 #endif // PASTEL_H_
