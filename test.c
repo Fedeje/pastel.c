@@ -100,45 +100,49 @@ typedef struct {
   }
 
 void test_fill_rect(void) {
-  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, 0, 0, 80, 40, PASTEL_BLUE);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, WIDTH - 60, HEIGHT - 60, 60, 60, PASTEL_RED);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, (WIDTH - 60) / 2, (HEIGHT - 60) / 2, 80, 60, PASTEL_GREEN);
+  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, PASTEL_BLACK);
+  pastel_fill_rect(canvas, 0, 0, 80, 40, PASTEL_BLUE);
+  pastel_fill_rect(canvas, WIDTH - 60, HEIGHT - 60, 60, 60, PASTEL_RED);
+  pastel_fill_rect(canvas, (WIDTH - 60) / 2, (HEIGHT - 60) / 2, 80, 60, PASTEL_GREEN);
 }
 
 void test_fill_circle(void) {
-  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
-  pastel_fill_circle(pixels, WIDTH, HEIGHT, 0, 0, 40, PASTEL_RED);
-  pastel_fill_circle(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT / 2, 45, PASTEL_GREEN);
-  pastel_fill_circle(pixels, WIDTH, HEIGHT, WIDTH, HEIGHT, 60, PASTEL_BLUE);
+  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, PASTEL_BLACK);
+  pastel_fill_circle(canvas, 0, 0, 40, PASTEL_RED);
+  pastel_fill_circle(canvas, WIDTH / 2, HEIGHT / 2, 45, PASTEL_GREEN);
+  pastel_fill_circle(canvas, WIDTH, HEIGHT, 60, PASTEL_BLUE);
 }
 
 void test_draw_line(void) {
-  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
+  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, PASTEL_BLACK);
   // Side lines
-  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, 0, 0, HEIGHT-1, PASTEL_RED);
-  pastel_draw_line(pixels, WIDTH, HEIGHT, WIDTH-1, 0, WIDTH-1, HEIGHT-1, PASTEL_RED);
+  pastel_draw_line(canvas, 0, 0, 0, HEIGHT-1, PASTEL_RED);
+  pastel_draw_line(canvas, WIDTH-1, 0, WIDTH-1, HEIGHT-1, PASTEL_RED);
   // Middle lines
-  pastel_draw_line(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, PASTEL_GREEN);
-  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT / 2, WIDTH-1, HEIGHT / 2, PASTEL_GREEN);
+  pastel_draw_line(canvas, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, PASTEL_GREEN);
+  pastel_draw_line(canvas, 0, HEIGHT / 2, WIDTH-1, HEIGHT / 2, PASTEL_GREEN);
   // Diagonal lines
-  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, 0, WIDTH-1, HEIGHT-1, PASTEL_BLUE);
-  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT-1, WIDTH-1, 0, PASTEL_BLUE);
+  pastel_draw_line(canvas, 0, 0, WIDTH-1, HEIGHT-1, PASTEL_BLUE);
+  pastel_draw_line(canvas, 0, HEIGHT-1, WIDTH-1, 0, PASTEL_BLUE);
 }
 
 void test_fill_triangle(void) {
-  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
-  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, PASTEL_BLACK);
+  pastel_fill_triangle2(canvas,
                        0, HEIGHT / 2,
                        (WIDTH-1)/2, HEIGHT-1,
                        (2*WIDTH)/3, 0,
                        PASTEL_RED);
-  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+  pastel_fill_triangle2(canvas,
                        0, HEIGHT/4,
                        (2*WIDTH)/3, (5*HEIGHT)/6,
                        (3*WIDTH)/4, (2*HEIGHT)/3,
                        PASTEL_GREEN);
-  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+  pastel_fill_triangle2(canvas,
                        (2*WIDTH)/3, HEIGHT/4,
                        WIDTH-1, HEIGHT/2,
                        (4*WIDTH)/5, (3*HEIGHT)/4,

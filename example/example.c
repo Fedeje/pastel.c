@@ -41,16 +41,17 @@ static uint32_t pixels[HEIGHT * WIDTH];
 
 bool corners_example(void) {
   // initialize buffer with bg color
-  pastel_fill(pixels, WIDTH, HEIGHT, BG_COLOR);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, 0, 0, 10, 10, FG_COLOR);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, 0, HEIGHT - 10, 10, 10, FG_COLOR);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, WIDTH - 10, 0, 10, 10, FG_COLOR);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, (WIDTH - 10) / 2, (HEIGHT - 10) / 2, 10, 10, FG_COLOR);
-  pastel_fill_rect(pixels, WIDTH, HEIGHT, WIDTH - 10, HEIGHT - 10, 10, 10, FG_COLOR);
+  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, BG_COLOR);
+  pastel_fill_rect(canvas, 0, 0, 10, 10, FG_COLOR);
+  pastel_fill_rect(canvas, 0, HEIGHT - 10, 10, 10, FG_COLOR);
+  pastel_fill_rect(canvas, WIDTH - 10, 0, 10, 10, FG_COLOR);
+  pastel_fill_rect(canvas, (WIDTH - 10) / 2, (HEIGHT - 10) / 2, 10, 10, FG_COLOR);
+  pastel_fill_rect(canvas, WIDTH - 10, HEIGHT - 10, 10, 10, FG_COLOR);
 
   const char* file_path = IMGS_DIR_PATH"/corners_examples.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -59,7 +60,8 @@ bool corners_example(void) {
 
 bool checker_example(void) {
   // initialize buffer with bg color
-  pastel_fill(pixels, WIDTH, HEIGHT, BG_COLOR);
+  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, BG_COLOR);
 
   size_t cols = 10;
   size_t rect_width = WIDTH / cols;
@@ -74,14 +76,13 @@ bool checker_example(void) {
     size_t y0 = i * (HEIGHT / rows);
     for (; j < cols; j += 2) {
       size_t x0 = j * (WIDTH / cols);
-      pastel_fill_rect(pixels, WIDTH, HEIGHT, x0, y0,
-                       rect_width, rect_height, FG_COLOR);
+      pastel_fill_rect(canvas, x0, y0, rect_width, rect_height, FG_COLOR);
     }
   }
 
   const char* file_path = IMGS_DIR_PATH"/checker_example.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -90,12 +91,13 @@ bool checker_example(void) {
 
 bool circle_example(void) {
   // initialize buffer with bg color
-  pastel_fill(pixels, WIDTH, HEIGHT, BG_COLOR);
+  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, BG_COLOR);
 
-  pastel_fill_circle(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT / 2, 25, FG_COLOR);
+  pastel_fill_circle(canvas, WIDTH / 2, HEIGHT / 2, 25, FG_COLOR);
   const char* file_path = IMGS_DIR_PATH"/circle_example.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -103,20 +105,21 @@ bool circle_example(void) {
 }
 
 bool line_example(void) {
-  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
+  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, PASTEL_BLACK);
   // Side lines
-  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, 0, 0, HEIGHT-1, PASTEL_RED);
-  pastel_draw_line(pixels, WIDTH, HEIGHT, WIDTH-1, 0, WIDTH-1, HEIGHT-1, PASTEL_RED);
+  pastel_draw_line(canvas, 0, 0, 0, HEIGHT-1, PASTEL_RED);
+  pastel_draw_line(canvas, WIDTH-1, 0, WIDTH-1, HEIGHT-1, PASTEL_RED);
   // Middle lines
-  pastel_draw_line(pixels, WIDTH, HEIGHT, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, PASTEL_GREEN);
-  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT / 2, WIDTH-1, HEIGHT / 2, PASTEL_GREEN);
+  pastel_draw_line(canvas, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, PASTEL_GREEN);
+  pastel_draw_line(canvas, 0, HEIGHT / 2, WIDTH-1, HEIGHT / 2, PASTEL_GREEN);
   // Diagonal lines
-  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, 0, WIDTH-1, HEIGHT-1, PASTEL_BLUE);
-  pastel_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT-1, WIDTH-1, 0, PASTEL_BLUE);
+  pastel_draw_line(canvas, 0, 0, WIDTH-1, HEIGHT-1, PASTEL_BLUE);
+  pastel_draw_line(canvas, 0, HEIGHT-1, WIDTH-1, 0, PASTEL_BLUE);
 
   const char* file_path = IMGS_DIR_PATH"/line_example.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -124,25 +127,26 @@ bool line_example(void) {
 }
 
 bool triangle_example(void) {
-  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
-  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, PASTEL_BLACK);
+  pastel_fill_triangle2(canvas,
                        0, HEIGHT / 2,
                        (WIDTH-1)/2, HEIGHT-1,
                        (2*WIDTH)/3, 0,
                        PASTEL_RED);
-  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+  pastel_fill_triangle2(canvas,
                        0, HEIGHT/4,
                        (2*WIDTH)/3, (5*HEIGHT)/6,
                        (3*WIDTH)/4, (2*HEIGHT)/3,
                        PASTEL_GREEN);
-  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+  pastel_fill_triangle2(canvas,
                        (2*WIDTH)/3, HEIGHT/4,
                        WIDTH-1, HEIGHT/2,
                        (4*WIDTH)/5, (3*HEIGHT)/4,
                        PASTEL_BLUE);
   const char* file_path = IMGS_DIR_PATH"/triangle_example.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
