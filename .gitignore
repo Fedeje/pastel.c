@@ -2,3 +2,4 @@ bin/
 imgs/
 *.ppm
 test/diff/
+.clangd
