@@ -1,5 +1,36 @@
 #ifndef PASTEL_H_
 #define PASTEL_H_
+//
+// How does a header only C library typically look like?
+// You have two components:
+//   - The declaration section, surrounded by the "BLA_H" header guard.
+//   - The definition section, which contains the actual implementation
+//     of the functions, surround by the "BLA_IMPLEMENTATION" guard.
+// Suppose you are building a lib with executables, which use the "Bla" project.
+// Two scenarios:
+//   - You are in a header file, i.e "whatever.h", you simply put:
+//        #include "bla.h"
+//   - You are in a compiled file (a .c typically), after ALL the includes, you
+//     put:
+//        #include "whatever.h"
+//        #include "something.h"
+//        ...
+//        #define BLA_IMPLEMENTATION
+//        #include "bla.h"
+// In that way, the implementation will only be available once, in the compilation
+// unit. Since you don't need the implementations in the header files like
+// "whatever.h", if you were to add the #define BLA_IMPLEMENTATION flag in one
+// of them, the compiler would throw an error message, which is good.
+//
+// In the rest of this file, we make functions static and inline
+//   - static: if another compilation unit requires a function from bla.h, it
+//     cannot go look for it elsewhere than its own compilation unit.
+//     The static keyword means the function is only visible by the current
+//     compilation unit.
+//   - inline: to have more compiler optimization.
+//     This makes the code heavier however.
+//
+
 // 
 // What does it take to render something on the screen?
 // 1 - Filling the image buffer
@@ -77,6 +108,8 @@ PASTELDEF void pastel_fill_triangle2(PastelCanvas canvas, int x0, int y0, int x1
 // On the CPU, this version is MUCH faster than the AABB ones above (3x faster). However, in practice, on the GPU, it's the AABB one which is implemented.
 // This is simply because you can assign each pixel of the AABB to a GPU core. Parallelism changes a lot (benchmarking is very important).
 PASTELDEF void pastel_fill_triangle(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color);
+
+#endif // PASTEL_H_
 
 // -----------------------------------------------------
 // -------------- PASTEL IMPLEMENTATIONS ---------------
@@ -364,4 +397,3 @@ PASTELDEF void pastel_fill_triangle(PastelCanvas canvas, int x0, int y0, int x1,
 }
 
 #endif // PASTEL_IMPLEMENTATION
-#endif // PASTEL_H_
