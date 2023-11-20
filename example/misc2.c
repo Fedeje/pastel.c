@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
-#include "pastel.c"
+#include "pastel.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "third-party/stb_image_write.h"
 

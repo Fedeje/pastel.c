@@ -1,5 +1,5 @@
-#ifndef PASTEL_C_
-#define PASTEL_C_
+#ifndef PASTEL_H_
+#define PASTEL_H_
 // 
 // What does it take to render something on the screen?
 // 1 - Filling the image buffer
@@ -397,4 +397,4 @@ void pastel_fill_triangle(uint32_t* pixels,
   }
 }
 
-#endif // PASTEL_C_
+#endif // PASTEL_H_
