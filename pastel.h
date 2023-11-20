@@ -22,12 +22,6 @@
 #include <stdio.h>
 #include <errno.h>
 
-// Typedef for error number.
-// Also, errno is a variable which contains the last
-// error returned by the system.
-// Returning errno is standard a way to catch errors.
-typedef int Errno;
-#define return_defer(value) do { result = (value); goto defer; } while (0)
 #define PASTEL_SWAP(T, val1, val2) do { T tmp = val1; val1 = val2; val2 = tmp; } while (0)
 #define PASTEL_SIGN(T, x) ((T)((x) > 0) - (T)((x) < 0))
 #define PASTEL_ABS(T, x) (PASTEL_SIGN(T, x) * (x))
@@ -35,47 +29,6 @@ typedef int Errno;
 #define PASTEL_MIN3(min, x, y, z) do { min = x; if (min > y) min = y; if (min > z) min = z; } while (0)
 #define PASTEL_MAX2(max, x, y) do { max = x; if (max < y) max = y; } while (0)
 #define PASTEL_MAX3(max, x, y, z) do { max = x; if (max < y) max = y; if (max < z) max = z; } while (0)
-
-//
-// Save an image to ppm format
-Errno pastel_write_to_ppm_file(uint32_t* pixels, // const is useless
-                               size_t pixels_width, size_t pixels_height,
-                               const char* file_path) {
-  // Header where stuff is allocated.
-  // When function needs to return, call return_defer.
-  // The `defer` label below takes care of de-allocating stuff.
-  int result = 0;
-  FILE* f = NULL;
-
-  // Body of the function
-  {
-    f = fopen(file_path, "wb"); /* write to binary */
-    if (f == NULL) return_defer(errno);
-
-    fprintf(f, "P6\n%zu %zu 255\n", pixels_width, pixels_height);
-    if (ferror(f)) return_defer(errno);
-
-    size_t i;
-    for (i = 0; i < pixels_width * pixels_height; ++i) {
-      uint32_t pixel = pixels[i];
-      // Pixel is: 0xAABBGGRR
-      // We use a combination of bit-shifting and bit-masking
-      // to extract the bytes corresponding to Red, Green and Blue
-      uint8_t bytes[3] = {
-        (pixel>>(8*0))&0xFF, // R
-        (pixel>>(8*1))&0xFF, // G
-        (pixel>>(8*2))&0xFF, // B
-      };
-      fwrite(bytes, sizeof(bytes), 1, f);
-      if (ferror(f)) return_defer(errno);
-    } // for loop
-  } // body of function
-
-defer: // this is a label you can "goto"
-  if (f) fclose(f);
-  return result;
-} // function `Errno pastel_write_to_ppm_file`
-
 
 //
 // Fill the entire image buffer with a given color.
