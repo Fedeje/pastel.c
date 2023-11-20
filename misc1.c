@@ -14,8 +14,26 @@ static uint32_t pixels[HEIGHT * WIDTH];
 #define IMGS_DIR_PATH "./imgs"
 
 int main() {
+  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
   for (size_t i = 0; i < 100000; ++i) {
-    pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
+
+    #if 0
+    pastel_fill_triangle_oriented(pixels, WIDTH, HEIGHT,
+                                  0, HEIGHT / 2,
+                                  (WIDTH - 1) / 2, HEIGHT - 1,
+                                  (2*WIDTH)/3, 0,
+                                  PASTEL_RED);
+    #endif
+
+    #if 1
+    pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+                          0, HEIGHT / 2,
+                          (WIDTH - 1) / 2, HEIGHT - 1,
+                          (2*WIDTH)/3, 0,
+                          PASTEL_RED);
+    #endif
+
+    #if 0
     // Side lines
     pastel_draw_line(pixels, WIDTH, HEIGHT, 0, 0, 0, HEIGHT-1, PASTEL_RED);
     pastel_draw_line(pixels, WIDTH, HEIGHT, WIDTH-1, 0, WIDTH-1, HEIGHT-1, PASTEL_RED);
@@ -25,6 +43,7 @@ int main() {
     // Diagonal lines
     pastel_draw_line(pixels, WIDTH, HEIGHT, 0, 0, WIDTH-1, HEIGHT-1, PASTEL_BLUE);
     pastel_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT-1, WIDTH-1, 0, PASTEL_BLUE);
+    #endif
   }
 
   // const char* file_path = IMGS_DIR_PATH"/misc1.png";

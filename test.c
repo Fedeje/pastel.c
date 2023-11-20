@@ -123,10 +123,30 @@ void test_draw_line(void) {
   pastel_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT-1, WIDTH-1, 0, PASTEL_BLUE);
 }
 
+void test_fill_triangle(void) {
+  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
+  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+                       0, HEIGHT / 2,
+                       (WIDTH-1)/2, HEIGHT-1,
+                       (2*WIDTH)/3, 0,
+                       PASTEL_RED);
+  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+                       0, HEIGHT/4,
+                       (2*WIDTH)/3, (5*HEIGHT)/6,
+                       (3*WIDTH)/4, (2*HEIGHT)/3,
+                       PASTEL_GREEN);
+  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+                       (2*WIDTH)/3, HEIGHT/4,
+                       WIDTH-1, HEIGHT/2,
+                       (4*WIDTH)/5, (3*HEIGHT)/4,
+                       PASTEL_BLUE);
+}
+
 TestCase test_cases[] = {
   DEFINE_TEST_CASE(test_fill_rect),
   DEFINE_TEST_CASE(test_fill_circle),
   DEFINE_TEST_CASE(test_draw_line),
+  DEFINE_TEST_CASE(test_fill_triangle),
 };
 
 #define TESTS_CASES_COUNT (sizeof(test_cases) / sizeof(test_cases[0]))

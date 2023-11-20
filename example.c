@@ -122,10 +122,37 @@ bool line_example(void) {
   return true;
 }
 
+bool triangle_example(void) {
+  pastel_fill(pixels, WIDTH, HEIGHT, PASTEL_BLACK);
+  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+                       0, HEIGHT / 2,
+                       (WIDTH-1)/2, HEIGHT-1,
+                       (2*WIDTH)/3, 0,
+                       PASTEL_RED);
+  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+                       0, HEIGHT/4,
+                       (2*WIDTH)/3, (5*HEIGHT)/6,
+                       (3*WIDTH)/4, (2*HEIGHT)/3,
+                       PASTEL_GREEN);
+  pastel_fill_triangle2(pixels, WIDTH, HEIGHT,
+                       (2*WIDTH)/3, HEIGHT/4,
+                       WIDTH-1, HEIGHT/2,
+                       (4*WIDTH)/5, (3*HEIGHT)/4,
+                       PASTEL_BLUE);
+  const char* file_path = IMGS_DIR_PATH"/triangle_example.png";
+  printf("Generated image %s\n", file_path);
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH*sizeof(uint32_t))) {
+      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
+      return false;
+  }
+  return true;
+}
+
 int main (void) {
   if (!corners_example()) return -1;
   if (!checker_example()) return -1;
   if (!circle_example()) return -1;
   if (!line_example()) return -1;
+  if (!triangle_example()) return -1;
   return 0;
 }
