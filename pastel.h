@@ -38,9 +38,13 @@
 // Here, we'll mainly focus on step 1, but if we have time, we'll
 // also take a look at step 2.
 // 
-// TODO: draw_line
+// TODO: Non-monochrome filling? Pass a function to the fill function? Like a shader?
+// TODO: 3D - Projective camera
+// TODO: Load mesh model
+// TODO: z-buffer
 // TODO: super-sampling for lines
-// TODO: fill_triangle
+// TODO: super-sampling for triangles
+// TODO: alpha blending
 // 
 
 #define PASTEL_RED   0xFF5472E8

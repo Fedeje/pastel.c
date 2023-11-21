@@ -2,7 +2,6 @@
 // Goal of tests: we record the behavior of the library.
 // When we change something, the library must still generate the same images.
 
-#include <_types/_uint32_t.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
