@@ -5,7 +5,8 @@ compile:
     mkdir -p ./bin/
     mkdir -p ./imgs/
     mkdir -p ./test/diff
-    clang example/example.c -Wall -Wextra -ggdb -std=c99 -I. -o ./bin/example
-    clang example/misc1.c -Wall -Wextra -O3 -std=c99 -I. -o ./bin/misc1
-    clang example/misc2.c -Wall -Wextra -O3 -std=c99 -I. -o ./bin/misc2
+    clang example/example.c -I. -Wall -Wextra -ggdb -std=c99 -o ./bin/example
+    clang example/misc1.c -I. -Wall -Wextra -O3 -std=c99 -o ./bin/misc1
+    clang example/misc2.c -I. -Wall -Wextra -O3 -std=c99 -o ./bin/misc2
     clang test.c -Wall -Wextra -ggdb -std=c99 -I. -o ./bin/test
+    /opt/homebrew/opt/llvm/bin/clang example/triangle.c -I. -Wall -Wextra -Os -fno-builtin -Wswitch-enum --target=wasm32 --no-standard-libraries -Wl,--export-all -Wl,--no-entry -Wl,--allow-undefined -o ./bin/triangle.wasm
