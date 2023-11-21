@@ -132,21 +132,21 @@ void test_draw_line(void) {
 void test_fill_triangle(void) {
   PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, PASTEL_BLACK);
-  pastel_fill_triangle2(canvas,
-                       0, HEIGHT / 2,
-                       (WIDTH-1)/2, HEIGHT-1,
-                       (2*WIDTH)/3, 0,
-                       PASTEL_RED);
-  pastel_fill_triangle2(canvas,
-                       0, HEIGHT/4,
-                       (2*WIDTH)/3, (5*HEIGHT)/6,
-                       (3*WIDTH)/4, (2*HEIGHT)/3,
-                       PASTEL_GREEN);
-  pastel_fill_triangle2(canvas,
-                       (2*WIDTH)/3, HEIGHT/4,
-                       WIDTH-1, HEIGHT/2,
-                       (4*WIDTH)/5, (3*HEIGHT)/4,
-                       PASTEL_BLUE);
+  pastel_fill_triangle(canvas,
+                      0, HEIGHT / 2,
+                      (WIDTH-1)/2, HEIGHT-1,
+                      (2*WIDTH)/3, 0,
+                      PASTEL_RED);
+  pastel_fill_triangle(canvas,
+                      0, HEIGHT/4,
+                      (2*WIDTH)/3, (5*HEIGHT)/6,
+                      (3*WIDTH)/4, (2*HEIGHT)/3,
+                      PASTEL_GREEN);
+  pastel_fill_triangle(canvas,
+                      (2*WIDTH)/3, HEIGHT/4,
+                      WIDTH-1, HEIGHT/2,
+                      (4*WIDTH)/5, (3*HEIGHT)/4,
+                      PASTEL_BLUE);
 }
 
 TestCase test_cases[] = {

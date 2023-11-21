@@ -129,21 +129,21 @@ bool line_example(void) {
 bool triangle_example(void) {
   PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, PASTEL_BLACK);
-  pastel_fill_triangle2(canvas,
-                       0, HEIGHT / 2,
-                       (WIDTH-1)/2, HEIGHT-1,
-                       (2*WIDTH)/3, 0,
-                       PASTEL_RED);
-  pastel_fill_triangle2(canvas,
-                       0, HEIGHT/4,
-                       (2*WIDTH)/3, (5*HEIGHT)/6,
-                       (3*WIDTH)/4, (2*HEIGHT)/3,
-                       PASTEL_GREEN);
-  pastel_fill_triangle2(canvas,
-                       (2*WIDTH)/3, HEIGHT/4,
-                       WIDTH-1, HEIGHT/2,
-                       (4*WIDTH)/5, (3*HEIGHT)/4,
-                       PASTEL_BLUE);
+  pastel_fill_triangle(canvas,
+                      0, HEIGHT / 2,
+                      (WIDTH-1)/2, HEIGHT-1,
+                      (2*WIDTH)/3, 0,
+                      PASTEL_RED);
+  pastel_fill_triangle(canvas,
+                      0, HEIGHT/4,
+                      (2*WIDTH)/3, (5*HEIGHT)/6,
+                      (3*WIDTH)/4, (2*HEIGHT)/3,
+                      PASTEL_GREEN);
+  pastel_fill_triangle(canvas,
+                      (2*WIDTH)/3, HEIGHT/4,
+                      WIDTH-1, HEIGHT/2,
+                      (4*WIDTH)/5, (3*HEIGHT)/4,
+                      PASTEL_BLUE);
   const char* file_path = IMGS_DIR_PATH"/triangle_example.png";
   printf("Generated image %s\n", file_path);
   if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {

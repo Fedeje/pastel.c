@@ -197,14 +197,13 @@ PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int
     // One solution is to truncate to nearest int, but this is costly for the CPU
     // as it means branching.
     // Solution which minimizes branching (best would be to benchmark tbh):
-    int dx = x1 - x0;
+    int dx = x1 - x0; // dx != 0 here
     int dy = y1 - y0;
-    int offset = y0 - (dy*x0)/dx;
     // float slope = ((float)dy) / ((float)dx);
     for (int x = x0; x <= x1; ++x) {
       if (0 <= x && x < (int)canvas.width) {
-        int ystart = (dy*x)/dx + offset;
-        int yend = (dy*(x+1))/dx + offset;
+        int ystart = y0 + ((x-x0)*dy)/dx;
+        int yend   = y0 + ((x+1-x0)*dy)/dx;
         if (ystart > yend) PASTEL_SWAP(int, ystart, yend);
         for(int y = ystart; y <= yend; ++y) {
           if (0 <= y && y < (int)canvas.height) {
@@ -358,15 +357,12 @@ PASTELDEF void pastel_fill_triangle(PastelCanvas canvas, int x0, int y0, int x1,
   // Draw first half of the triangle
   int dx1 = x1 - x0;
   int dy1 = y1 - y0;
-  int c1 = y0 - (dy1*x0)/dx1;
   int dx2 = x2 - x0;
   int dy2 = y2 - y0;
-  int c2 = y0 - (dy2*x0)/dx2;
-  int xl1, xl2;
   for (int y = y0; y <= y1; ++y) {
     if (0 <= y && y < (int)canvas.height) {
-      xl1 = (dx1*(y-c1))/dy1;
-      xl2 = (dx2*(y-c2))/dy2;
+      int xl1 = dy1 != 0 ? x0 + ((y-y0)*dx1)/dy1 : x0;
+      int xl2 = dy2 != 0 ? x0 + ((y-y0)*dx2)/dy2 : x0;
       if (xl1 > xl2) PASTEL_SWAP(int, xl1, xl2);
       for (int x = xl1; x <= xl2; ++x) {
         if (0 <= x && x < (int)canvas.width) {
@@ -377,15 +373,14 @@ PASTELDEF void pastel_fill_triangle(PastelCanvas canvas, int x0, int y0, int x1,
   }
 
   // Draw second half of the triangle
-  dx1 = x2 - xl1;
-  int dy = y2 - y1;
-  c1 = y1 - (dy*xl1)/dx1;
-  dx2 = x2 - xl2;
-  c2 = y1 - (dy*xl2)/dx2;
+  dx1 = x2 - x0;
+  dy1 = y2 - y0;
+  dx2 = x2 - x1;
+  dy2 = y2 - y1;
   for (int y = y1; y <= y2; ++y) {
     if (0 <= y && y < (int)canvas.height) {
-      xl1 = (dx1*(y-c1))/dy;
-      xl2 = (dx2*(y-c2))/dy;
+      int xl1 = dy1 != 0 ? x2 + ((y-y2)*dx1)/dy1 : x2;
+      int xl2 = dy2 != 0 ? x2 + ((y-y2)*dx2)/dy2 : x2;
       if (xl1 > xl2) PASTEL_SWAP(int, xl1, xl2);
       for (int x = xl1; x <= xl2; ++x) {
         if (0 <= x && x < (int)canvas.width) {
