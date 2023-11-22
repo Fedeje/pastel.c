@@ -11,3 +11,7 @@ compile:
     clang test.c -Wall -Wextra -ggdb -std=c99 -I. -o ./bin/test
     /opt/homebrew/opt/llvm/bin/clang example/triangle.c -I. -Wall -Wextra -Os --target=wasm32 --no-standard-libraries -Wl,--export-all -Wl,--no-entry -Wl,--allow-undefined -o ./bin/triangle.wasm
     clang test.c -I. -Wall -Wextra -ggdb -std=c99 -lm -o ./bin/test
+
+generate_clangd:
+    -rm -f .clangd
+    export PASTEL_DIR=$(pwd) && ./generate_clangd.sh

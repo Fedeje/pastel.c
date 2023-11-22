@@ -1,3 +1,4 @@
+#!/bin/sh
 echo "
 CompileFlags:
     Add: [-xc,
