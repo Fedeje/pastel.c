@@ -38,13 +38,20 @@
 // Here, we'll mainly focus on step 1, but if we have time, we'll
 // also take a look at step 2.
 // 
-// TODO: Non-monochrome filling? Pass a function to the fill function? Like a shader?
+// TODO: monochrome color shader instead of `uint32_t color` -> avoid duplication of functions...
+// TODO: SDL to have a window instead of png / web thingy
+// TODO: Immediate mode GUI? Like DearImgui (cimgui) or Nuklear
 // TODO: 3D - Projective camera
 // TODO: Load mesh model
 // TODO: z-buffer
 // TODO: super-sampling for lines
 // TODO: super-sampling for triangles
 // TODO: alpha blending
+// TODO: font
+// TODO: terminal rendering
+// TODO: bezier curves
+// TODO: textures
+// TODO: signed distance functions / shape blending / ray marching
 // 
 
 #define PASTEL_RED    0xFF5472E8
