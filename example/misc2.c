@@ -16,7 +16,7 @@ static uint32_t pixels[HEIGHT * WIDTH];
 
 int main() {
   for (size_t i = 0; i < 100000; ++i) {
-    PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+    PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
     pastel_fill(canvas, PASTEL_BLACK);
     // Side lines
     pastel_draw_line2(canvas, 0, 0, 0, HEIGHT-1, PASTEL_RED);
