@@ -99,7 +99,7 @@ typedef struct {
   }
 
 void test_fill_rect(void) {
-  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, PASTEL_BLACK);
   pastel_fill_rect(canvas, 0, 0, 80, 40, PASTEL_BLUE);
   pastel_fill_rect(canvas, WIDTH - 60, HEIGHT - 60, 60, 60, PASTEL_RED);
@@ -107,7 +107,7 @@ void test_fill_rect(void) {
 }
 
 void test_fill_circle(void) {
-  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, PASTEL_BLACK);
   pastel_fill_circle(canvas, 0, 0, 40, PASTEL_RED);
   pastel_fill_circle(canvas, WIDTH / 2, HEIGHT / 2, 45, PASTEL_GREEN);
@@ -115,7 +115,7 @@ void test_fill_circle(void) {
 }
 
 void test_draw_line(void) {
-  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, PASTEL_BLACK);
   // Side lines
   pastel_draw_line(canvas, 0, 0, 0, HEIGHT-1, PASTEL_RED);
@@ -129,7 +129,7 @@ void test_draw_line(void) {
 }
 
 void test_fill_triangle(void) {
-  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, PASTEL_BLACK);
   pastel_fill_triangle(canvas,
                       0, HEIGHT / 2,
@@ -148,10 +148,50 @@ void test_fill_triangle(void) {
                       PASTEL_BLUE);
 }
 
+uint32_t line_shader1(PastelShaderContext* shader_param) {
+  if (shader_param->count == 10) {
+    shader_param->color_index++;
+    if (shader_param->color_index > 2) shader_param->color_index = 0;
+    shader_param->count = 0;
+  } else {
+    shader_param->count++;
+  }
+  return shader_param->colors[shader_param->color_index];
+}
+
+uint32_t line_shader2(PastelShaderContext* shader_param) {
+  if (shader_param->x < WIDTH/2) {
+    return PASTEL_RED;
+  }
+  return PASTEL_GREEN;
+}
+
+uint32_t line_shader3(PastelShaderContext* shader_param) {
+  if (shader_param->y < HEIGHT/2) {
+    return PASTEL_BLUE;
+  }
+  return PASTEL_YELLOW;
+}
+
+void test_draw_line_with_shader(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, PASTEL_BLACK);
+
+  uint32_t colors[3] = { PASTEL_RED, PASTEL_GREEN, PASTEL_BLUE };
+  PastelShaderContext shader_context = pastel_shader_context_create(0, 0, 0, 0, colors);
+  // Middle lines
+  pastel_draw_line_with_shader(canvas, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, line_shader1, &shader_context);
+  pastel_draw_line_with_shader(canvas, 0, HEIGHT / 2, WIDTH-1, HEIGHT / 2, line_shader1, &shader_context);
+  // Diagonal lines
+  pastel_draw_line_with_shader(canvas, 0, HEIGHT-1, WIDTH-1, 0, line_shader2, &shader_context);
+  pastel_draw_line_with_shader(canvas, 0, 0, WIDTH-1, HEIGHT-1, line_shader3, &shader_context);
+}
+
 TestCase test_cases[] = {
   DEFINE_TEST_CASE(test_fill_rect),
   DEFINE_TEST_CASE(test_fill_circle),
   DEFINE_TEST_CASE(test_draw_line),
+  DEFINE_TEST_CASE(test_draw_line_with_shader),
   DEFINE_TEST_CASE(test_fill_triangle),
 };
 

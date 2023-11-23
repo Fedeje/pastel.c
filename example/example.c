@@ -41,7 +41,7 @@ static uint32_t pixels[HEIGHT * WIDTH];
 
 bool corners_example(void) {
   // initialize buffer with bg color
-  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, BG_COLOR);
   pastel_fill_rect(canvas, 0, 0, 10, 10, FG_COLOR);
   pastel_fill_rect(canvas, 0, HEIGHT - 10, 10, 10, FG_COLOR);
@@ -60,7 +60,7 @@ bool corners_example(void) {
 
 bool checker_example(void) {
   // initialize buffer with bg color
-  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, BG_COLOR);
 
   size_t cols = 10;
@@ -91,7 +91,7 @@ bool checker_example(void) {
 
 bool circle_example(void) {
   // initialize buffer with bg color
-  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, BG_COLOR);
 
   pastel_fill_circle(canvas, WIDTH / 2, HEIGHT / 2, 25, FG_COLOR);
@@ -105,7 +105,7 @@ bool circle_example(void) {
 }
 
 bool line_example(void) {
-  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, PASTEL_BLACK);
   // Side lines
   pastel_draw_line(canvas, 0, 0, 0, HEIGHT-1, PASTEL_RED);
@@ -126,8 +126,55 @@ bool line_example(void) {
   return true;
 }
 
+uint32_t line_shader1(PastelShaderContext* shader_param) {
+  if (shader_param->count == 10) {
+    shader_param->color_index++;
+    if (shader_param->color_index > 2) shader_param->color_index = 0;
+    shader_param->count = 0;
+  } else {
+    shader_param->count++;
+  }
+  return shader_param->colors[shader_param->color_index];
+}
+
+uint32_t line_shader2(PastelShaderContext* shader_param) {
+  if (shader_param->x < WIDTH/2) {
+    return PASTEL_RED;
+  }
+  return PASTEL_GREEN;
+}
+
+uint32_t line_shader3(PastelShaderContext* shader_param) {
+  if (shader_param->y < HEIGHT/2) {
+    return PASTEL_BLUE;
+  }
+  return PASTEL_YELLOW;
+}
+
+bool line_shader_example(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_fill(canvas, PASTEL_BLACK);
+
+  uint32_t colors[3] = { PASTEL_RED, PASTEL_GREEN, PASTEL_BLUE };
+  PastelShaderContext shader_context = pastel_shader_context_create(0, 0, 0, 0, colors);
+  // Middle lines
+  pastel_draw_line_with_shader(canvas, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, line_shader1, &shader_context);
+  pastel_draw_line_with_shader(canvas, 0, HEIGHT / 2, WIDTH-1, HEIGHT / 2, line_shader1, &shader_context);
+  // Diagonal lines
+  pastel_draw_line_with_shader(canvas, 0, HEIGHT-1, WIDTH-1, 0, line_shader2, &shader_context);
+  pastel_draw_line_with_shader(canvas, 0, 0, WIDTH-1, HEIGHT-1, line_shader3, &shader_context);
+
+  const char* file_path = IMGS_DIR_PATH"/line_shader_example.png";
+  printf("Generated image %s\n", file_path);
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
+      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
+      return false;
+  }
+  return true;
+}
+
 bool triangle_example(void) {
-  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_fill(canvas, PASTEL_BLACK);
   pastel_fill_triangle(canvas,
                       0, HEIGHT / 2,
@@ -158,6 +205,7 @@ int main (void) {
   if (!checker_example()) return -1;
   if (!circle_example()) return -1;
   if (!line_example()) return -1;
+  if (!line_shader_example()) return -1;
   if (!triangle_example()) return -1;
   return 0;
 }

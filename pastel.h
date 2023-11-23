@@ -47,10 +47,11 @@
 // TODO: alpha blending
 // 
 
-#define PASTEL_RED   0xFF5472E8
-#define PASTEL_GREEN 0xFF79E854
-#define PASTEL_BLUE  0xFFE86056
-#define PASTEL_BLACK 0xFF3A3C45
+#define PASTEL_RED    0xFF5472E8
+#define PASTEL_GREEN  0xFF79E854
+#define PASTEL_BLUE   0xFFE86056
+#define PASTEL_YELLOW 0xFF3EF0AF
+#define PASTEL_BLACK  0xFF3A3C45
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -67,6 +68,7 @@
 #define PASTEL_MAX2(max, x, y) do { max = x; if (max < y) max = y; } while (0)
 #define PASTEL_MAX3(max, x, y, z) do { max = x; if (max < y) max = y; if (max < z) max = z; } while (0)
 #define PASTEL_PIXEL(canvas, x, y) (canvas).pixels[(y) * (canvas).stride + (x)]
+#define PASTEL_SHADER_TYPE(shader) uint32_t (*(shader))(PastelShaderContext*)
 
 // --------------------------------------
 // -------------- STRUCTS ---------------
@@ -78,6 +80,17 @@ typedef struct {
   size_t stride;
 } PastelCanvas;
 
+// Extensible shader context.
+// For the moment it only contains the (x, y) position of a pixel on the screen but we can add more stuff 
+// in the context in the future.
+typedef struct {
+  int x;
+  int y;
+  int count;
+  size_t color_index;
+  uint32_t* colors;
+} PastelShaderContext;
+
 // ----------------------------------------
 // -------------- FUNCTIONS ---------------
 // ----------------------------------------
@@ -87,7 +100,7 @@ typedef struct {
 
 //
 // Create a canvas: image with its width, height and stride (width if row-major, height if column-major).
-PASTELDEF PastelCanvas pastel_create_canvas(uint32_t* pixels, size_t pixels_width, size_t pixels_height);
+PASTELDEF PastelCanvas pastel_canvas_create(uint32_t* pixels, size_t pixels_width, size_t pixels_height);
 //
 // Fill the entire image buffer with a given color.
 PASTELDEF void pastel_fill(PastelCanvas canvas, uint32_t color);
@@ -101,6 +114,15 @@ PASTELDEF void pastel_fill_circle(PastelCanvas canvas, int x0, int y0, size_t r,
 // Draw a line with a given color. A line starts at (x0, y0) and ends at (x1, y1).
 PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int y1, uint32_t color);
 PASTELDEF void pastel_draw_line2(PastelCanvas canvas, int x0, int y0, int x1, int y1, uint32_t color);
+//
+// Draw a line with a given shader.
+// A shader is simply a function which takes a context (information about a scene and the pixel at which the shader is computed)
+// and performs computation on the current pixel. A shader is meant to be applied to every pixel of the image / every pixel
+// of the object being rendered.
+PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0, int x1, int y1, PASTEL_SHADER_TYPE(shader), PastelShaderContext* context);
+//
+// Create a shader context. This context contains information on the scene which is relevant to the shader computation.
+PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int count, int color_index, uint32_t* colors);
 //
 // Fill a triangle with a given color. A triangle is 3 points (x0, y0), (x1, y1) and (x2, y2)
 // Convention: the triangles are stored counter-clockwise.
@@ -119,7 +141,7 @@ PASTELDEF void pastel_fill_triangle(PastelCanvas canvas, int x0, int y0, int x1,
 // -------------- PASTEL IMPLEMENTATIONS ---------------
 // -----------------------------------------------------
 #ifdef PASTEL_IMPLEMENTATION
-PASTELDEF PastelCanvas pastel_create_canvas(uint32_t* pixels, size_t pixels_width, size_t pixels_height) {
+PASTELDEF PastelCanvas pastel_canvas_create(uint32_t* pixels, size_t pixels_width, size_t pixels_height) {
   PastelCanvas canvas = {
     .pixels = pixels,
     .width = pixels_width,
@@ -270,6 +292,75 @@ PASTELDEF void pastel_draw_line2(PastelCanvas canvas, int x0, int y0, int x1, in
     }
   }
 }
+
+PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int count, int color_index, uint32_t* colors) {
+  PastelShaderContext context = {
+    .x = x,
+    .y = y,
+    .count = count,
+    .color_index = color_index,
+    .colors = colors
+  };
+  return context;
+}
+
+PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0, int x1, int y1, PASTEL_SHADER_TYPE(shader), PastelShaderContext* shader_context) {
+  if (x0 == x1) {
+    // Vertical line
+    if (0 <= x0 && x0 < (int)canvas.width) {
+      if (y0 > y1) PASTEL_SWAP(int, y0, y1);
+      for (int y = y0; y <= y1; ++y) {
+        if (0 <= y && y < (int)canvas.height) {
+          shader_context->x = x0; shader_context->y = y;
+          uint32_t color = shader(shader_context);
+          PASTEL_PIXEL(canvas, x0, y) =  color;
+        }
+      }
+    }
+  } else if (y0 == y1) {
+    // Horizontal line
+    if (0 <= y0 && y0 < (int)canvas.height) {
+      if (x0 > x1) PASTEL_SWAP(int, x0, x1);
+      for (int x = x0; x <= x1; ++x) {
+        if (0 <= x && x < (int)canvas.width) {
+          shader_context->x = x; shader_context->y = y0;
+          uint32_t color = shader(shader_context);
+          PASTEL_PIXEL(canvas, x, y0) =  color;
+        }
+      }
+    }
+  } else {
+    if (x0 > x1) {
+      PASTEL_SWAP(int, x0, x1);
+      PASTEL_SWAP(int, y0, y1);
+    }
+    // So, there is an "issue" with using int.
+    // If we simply increment y by the float slope, since it can be < 1,
+    // the casting of the slope to int will resolve to 0 and we would
+    // never increment y.
+    // One solution is to truncate to nearest int, but this is costly for the CPU
+    // as it means branching.
+    // Solution which minimizes branching (best would be to benchmark tbh):
+    int dx = x1 - x0; // dx != 0 here
+    int dy = y1 - y0;
+    // float slope = ((float)dy) / ((float)dx);
+    for (int x = x0; x <= x1; ++x) {
+      if (0 <= x && x < (int)canvas.width) {
+        int ystart = y0 + ((x-x0)*dy)/dx;
+        int yend   = y0 + ((x+1-x0)*dy)/dx;
+        if (ystart > yend) PASTEL_SWAP(int, ystart, yend);
+        for(int y = ystart; y <= yend; ++y) {
+          if (0 <= y && y < (int)canvas.height) {
+            shader_context->x = x; shader_context->y = y;
+            uint32_t color = shader(shader_context);
+            PASTEL_PIXEL(canvas, x, y) =  color;
+          }
+        }
+      }
+    }
+  }
+}
+
 
 // Convention: the triangles are stored counter-clockwise.
 //
