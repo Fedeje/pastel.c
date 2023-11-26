@@ -38,6 +38,11 @@
 // Here, we'll mainly focus on step 1, but if we have time, we'll
 // also take a look at step 2.
 // 
+// Notes on shaders:
+// A shader is simply a function which takes a context (information about a scene and the pixel at which the shader is computed)
+// and performs computation on the current pixel.
+// A shader is meant to be applied to every pixel of the image / every pixel of the object being rendered.
+// 
 // TODO: monochrome color shader instead of `Color color` -> avoid duplication of functions...
 // TODO: SDL to have a window instead of png / web thingy
 // TODO: Immediate mode GUI? Like DearImgui (cimgui) or Nuklear
@@ -116,6 +121,10 @@ PASTEL_TYPEDEF_VEC2(int, Vec2i);
 // @brief Create a canvas: image with its width, height and stride (width if row-major, height if column-major).
 PASTELDEF PastelCanvas pastel_canvas_create(Color* pixels, size_t pixels_width, size_t pixels_height);
 
+// @brief Create a shader context.
+// This context contains information on the scene which is relevant to the shader computation.
+PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int count, int color_index, Color* colors);
+
 // @brief Monochrome shader.
 PASTELDEF Color pastel_monochrome_shader(PastelShaderContext* context);
 
@@ -126,27 +135,20 @@ PASTELDEF void pastel_fill(PastelCanvas canvas, PASTEL_SHADER(shader), PastelSha
 // A rectangle starts at pixel (x0, y0) and has a width and a height.
 // @param pos the upper left corner of the rectangle
 // @param dim_rect the width and length of the rectangle
-PASTELDEF void pastel_fill_rect(PastelCanvas canvas, const Vec2i* pos, const Vec2ui* dim_rect, PASTEL_SHADER(shader), PastelShaderContext* context);
+PASTELDEF void pastel_fill_rect(PastelCanvas canvas, const Vec2i* p, const Vec2ui* dim_rect, PASTEL_SHADER(shader), PastelShaderContext* context);
 
 // @brief Fill a circle with a given color.
 // A circle has center (x0, y0) and radius r.
-PASTELDEF void pastel_fill_circle(PastelCanvas canvas, const Vec2i* pos, size_t r, PASTEL_SHADER(shader), PastelShaderContext* context);
+// @param p the center position.
+// @param r the radius.
+PASTELDEF void pastel_fill_circle(PastelCanvas canvas, const Vec2i* p, size_t r, PASTEL_SHADER(shader), PastelShaderContext* context);
 
 // @brief Draw a line with a given color.
 // A line starts at (x0, y0) and ends at (x1, y1).
-PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int y1, Color color);
-PASTELDEF void pastel_draw_line2(PastelCanvas canvas, int x0, int y0, int x1, int y1, Color color);
-
-
-// @brief Draw a line with a given shader.
-// A shader is simply a function which takes a context (information about a scene and the pixel at which the shader is computed)
-// and performs computation on the current pixel. A shader is meant to be applied to every pixel of the image / every pixel
-// of the object being rendered.
-PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0, int x1, int y1, PASTEL_SHADER(shader), PastelShaderContext* context);
-
-// @brief Create a shader context.
-// This context contains information on the scene which is relevant to the shader computation.
-PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int count, int color_index, Color* colors);
+// @param p1 and p2 the two points of the line segment.
+PASTELDEF void pastel_draw_line(PastelCanvas canvas, const Vec2i* p1, const Vec2i* p2, PASTEL_SHADER(shader), PastelShaderContext* context);
+// Deprecated. Use pastel_draw_line instead.
+PASTELDEF void pastel_draw_line2(PastelCanvas canvas, const Vec2i* p1, const Vec2i* p2, PASTEL_SHADER(shader), PastelShaderContext* context);
 
 // @brief Fill a triangle with a given color.
 // A triangle is 3 points (x0, y0), (x1, y1) and (x2, y2)
@@ -178,6 +180,17 @@ PASTELDEF PastelCanvas pastel_canvas_create(Color* pixels, size_t pixels_width, 
   return canvas;
 }
 
+PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int count, int color_index, Color* colors) {
+  PastelShaderContext context = {
+    .x = x,
+    .y = y,
+    .count = count,
+    .color_index = color_index,
+    .colors = colors
+  };
+  return context;
+}
+
 PASTELDEF Color pastel_monochrome_shader(PastelShaderContext* context) {
   return context->colors[0];
 }
@@ -192,11 +205,11 @@ PASTELDEF void pastel_fill(PastelCanvas canvas, PASTEL_SHADER(shader), PastelSha
   }
 } // function `void pastel_fill`
 
-PASTELDEF void pastel_fill_rect(PastelCanvas canvas, const Vec2i* pos, const Vec2ui* dim_rect, PASTEL_SHADER(shader), PastelShaderContext* context) {
+PASTELDEF void pastel_fill_rect(PastelCanvas canvas, const Vec2i* p, const Vec2ui* dim_rect, PASTEL_SHADER(shader), PastelShaderContext* context) {
   // A pixel image is row-major
-  for (int y = pos->y; y <= pos->y + (int)dim_rect->y; ++y) {
+  for (int y = p->y; y <= p->y + (int)dim_rect->y; ++y) {
     if (0 <= y && y < (int)canvas.height) {
-      for (int x = pos->x; x <= pos->x + (int)dim_rect->x; ++x) {
+      for (int x = p->x; x <= p->x + (int)dim_rect->x; ++x) {
         if (0 <= x && x < (int)canvas.width) {
           context->x = x; context->y = y;
           Color color = shader(context);
@@ -207,16 +220,16 @@ PASTELDEF void pastel_fill_rect(PastelCanvas canvas, const Vec2i* pos, const Vec
   }
 }
 
-PASTELDEF void pastel_fill_circle(PastelCanvas canvas, const Vec2i* pos, size_t r, PASTEL_SHADER(shader), PastelShaderContext* context) {
-  int x0_aabb = pos->x - r;
-  int y0_aabb = pos->y - r;
+PASTELDEF void pastel_fill_circle(PastelCanvas canvas, const Vec2i* p, size_t r, PASTEL_SHADER(shader), PastelShaderContext* context) {
+  int x0_aabb = p->x - r;
+  int y0_aabb = p->y - r;
   int r2 = (int)(r * r);
   for (int y = y0_aabb; y <= y0_aabb + 2 * (int)r; ++y) {
     if (0 <= y && y < (int)canvas.height) {
-      int dist_to_center_y2 = (y - pos->y) * (y - pos->y);
+      int dist_to_center_y2 = (y - p->y) * (y - p->y);
       for (int x = x0_aabb; x <= x0_aabb + 2 * (int)r; ++x) {
         if (0 <= x && x < (int)canvas.width) {
-          int dist_to_center_x2 = (x - pos->x) * (x - pos->x);
+          int dist_to_center_x2 = (x - p->x) * (x - p->x);
           if ((dist_to_center_x2 + dist_to_center_y2) <= r2) {
             context->x = x; context->y = y;
             Color color = shader(context);
@@ -229,14 +242,19 @@ PASTELDEF void pastel_fill_circle(PastelCanvas canvas, const Vec2i* pos, size_t 
   }
 }
 
-PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int y1, Color color) {
+PASTELDEF void pastel_draw_line(PastelCanvas canvas, const Vec2i* p1, const Vec2i* p2, PASTEL_SHADER(shader), PastelShaderContext* context) {
+  int x0 = p1->x; int y0 = p1->y;
+  int x1 = p2->x; int y1 = p2->y;
   if (x0 == x1) {
     // Vertical line
     if (0 <= x0 && x0 < (int)canvas.width) {
       if (y0 > y1) PASTEL_SWAP(int, y0, y1);
       for (int y = y0; y <= y1; ++y) {
         if (0 <= y && y < (int)canvas.height) {
+          context->x = x0; context->y = y;
+          Color color = shader(context);
           PASTEL_PIXEL(canvas, x0, y) =  color;
+
         }
       }
     }
@@ -246,7 +264,10 @@ PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int
       if (x0 > x1) PASTEL_SWAP(int, x0, x1);
       for (int x = x0; x <= x1; ++x) {
         if (0 <= x && x < (int)canvas.width) {
+          context->x = x; context->y = y0;
+          Color color = shader(context);
           PASTEL_PIXEL(canvas, x, y0) =  color;
+
         }
       }
     }
@@ -272,134 +293,16 @@ PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int
         if (ystart > yend) PASTEL_SWAP(int, ystart, yend);
         for(int y = ystart; y <= yend; ++y) {
           if (0 <= y && y < (int)canvas.height) {
+            context->x = x; context->y = y;
+            Color color = shader(context);
             PASTEL_PIXEL(canvas, x, y) =  color;
+
           }
         }
       }
     }
   }
 }
-
-// NOTE: this code is not faster than `pastel_draw_line`.
-PASTELDEF void pastel_draw_line2(PastelCanvas canvas, int x0, int y0, int x1, int y1, Color color) {
-  bool steep = false;
-  if (PASTEL_ABS(int, x0 - x1) < PASTEL_ABS(int, y0 - y1)) {
-    // The line is too steep meaning an increment of x will lead
-    // to multiple increments in y.
-    // We want to fallback to the case where an increment of x can
-    // only lead to at most one increment of y.
-    // This is only the case when slope < 1.
-    // Thus We transpose the line <=> slope = 1 / slope.
-    PASTEL_SWAP(int, x0, y0);
-    PASTEL_SWAP(int, x1, y1);
-    steep = true;
-  }
-
-  if (x0 > x1) {
-    PASTEL_SWAP(int, x0, x1);
-    PASTEL_SWAP(int, y0, y1);
-  }
-
-  // When do we increment y?
-  // When the error between currently drawn line and "real" line
-  // is greater than one pixel, we increment y.
-  int dx = x1 - x0;
-  int dy = y1 - y0;
-  int y = y0;
-  int error = 0;
-  // float error_increment = PASTEL_ABS(int, dy/dx);
-  // we then compare the error to 0.5 (middle btw 0 and 1)
-  // to see if we increment y.
-  // To remove floats, we multiply everything by 2*dx
-  int error_increment = PASTEL_ABS(int, dy) * 2;
-  for (int x = x0; x <= x1; ++x) {
-    // Draw pixel
-    if (steep) {
-      if (0 <= x0 && x < (int)canvas.height && 0 <= y0 && y < (int) canvas.width) {
-        PASTEL_PIXEL(canvas, x, y) =  color;
-      }
-    } else {
-      if (0 <= x0 && x < (int)canvas.width && 0 <= y0 && y < (int)canvas.height) {
-        PASTEL_PIXEL(canvas, x, y) =  color;
-      }
-    }
-    // Increment y if needed
-    error += error_increment;
-    if (error > dx) {
-      y += (y1 > y0 ? 1 : -1);
-      error -= dx * 2;
-    }
-  }
-}
-
-PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int count, int color_index, Color* colors) {
-  PastelShaderContext context = {
-    .x = x,
-    .y = y,
-    .count = count,
-    .color_index = color_index,
-    .colors = colors
-  };
-  return context;
-}
-
-PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0, int x1, int y1, PASTEL_SHADER(shader), PastelShaderContext* shader_context) {
-  if (x0 == x1) {
-    // Vertical line
-    if (0 <= x0 && x0 < (int)canvas.width) {
-      if (y0 > y1) PASTEL_SWAP(int, y0, y1);
-      for (int y = y0; y <= y1; ++y) {
-        if (0 <= y && y < (int)canvas.height) {
-          shader_context->x = x0; shader_context->y = y;
-          Color color = shader(shader_context);
-          PASTEL_PIXEL(canvas, x0, y) =  color;
-        }
-      }
-    }
-  } else if (y0 == y1) {
-    // Horizontal line
-    if (0 <= y0 && y0 < (int)canvas.height) {
-      if (x0 > x1) PASTEL_SWAP(int, x0, x1);
-      for (int x = x0; x <= x1; ++x) {
-        if (0 <= x && x < (int)canvas.width) {
-          shader_context->x = x; shader_context->y = y0;
-          Color color = shader(shader_context);
-          PASTEL_PIXEL(canvas, x, y0) =  color;
-        }
-      }
-    }
-  } else {
-    if (x0 > x1) {
-      PASTEL_SWAP(int, x0, x1);
-      PASTEL_SWAP(int, y0, y1);
-    }
-    // So, there is an "issue" with using int.
-    // If we simply increment y by the float slope, since it can be < 1,
-    // the casting of the slope to int will resolve to 0 and we would
-    // never increment y.
-    // One solution is to truncate to nearest int, but this is costly for the CPU
-    // as it means branching.
-    // Solution which minimizes branching (best would be to benchmark tbh):
-    int dx = x1 - x0; // dx != 0 here
-    int dy = y1 - y0;
-    // float slope = ((float)dy) / ((float)dx);
-    for (int x = x0; x <= x1; ++x) {
-      if (0 <= x && x < (int)canvas.width) {
-        int ystart = y0 + ((x-x0)*dy)/dx;
-        int yend   = y0 + ((x+1-x0)*dy)/dx;
-        if (ystart > yend) PASTEL_SWAP(int, ystart, yend);
-        for(int y = ystart; y <= yend; ++y) {
-          if (0 <= y && y < (int)canvas.height) {
-            shader_context->x = x; shader_context->y = y;
-            Color color = shader(shader_context);
-            PASTEL_PIXEL(canvas, x, y) =  color;
-          }
-        }
-      }
-    }
-  }
-}
-
 
 // Convention: the triangles are stored counter-clockwise.
 //

@@ -152,15 +152,40 @@ void test_draw_line(void) {
   PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &color);
   pastel_fill(canvas, pastel_monochrome_shader, &context);
 
+  Vec2i p1, p2;
+
+  //
   // Side lines
-  pastel_draw_line(canvas, 0, 0, 0, HEIGHT-1, PASTEL_RED);
-  pastel_draw_line(canvas, WIDTH-1, 0, WIDTH-1, HEIGHT-1, PASTEL_RED);
+  color = PASTEL_RED;
+  p1.x = 0; p1.y = 0;
+  p2.x = 0; p2.y = HEIGHT-1;
+  pastel_draw_line(canvas, &p1, &p2, pastel_monochrome_shader, &context);
+
+  p1.x = WIDTH-1; p1.y = 0;
+  p2.x = WIDTH-1; p2.y = HEIGHT-1;
+  pastel_draw_line(canvas, &p1, &p2, pastel_monochrome_shader, &context);
+
+  //
   // Middle lines
-  pastel_draw_line(canvas, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, PASTEL_GREEN);
-  pastel_draw_line(canvas, 0, HEIGHT / 2, WIDTH-1, HEIGHT / 2, PASTEL_GREEN);
+  color = PASTEL_GREEN;
+  p1.x = WIDTH/2; p1.y = HEIGHT-1;
+  p2.x = WIDTH/2; p2.y = 0;
+  pastel_draw_line(canvas, &p1, &p2, pastel_monochrome_shader, &context);
+
+  p1.x = 0; p1.y = HEIGHT/2;
+  p2.x = WIDTH-1; p2.y = HEIGHT/2;
+  pastel_draw_line(canvas, &p1, &p2, pastel_monochrome_shader, &context);
+
+  //
   // Diagonal lines
-  pastel_draw_line(canvas, 0, 0, WIDTH-1, HEIGHT-1, PASTEL_BLUE);
-  pastel_draw_line(canvas, 0, HEIGHT-1, WIDTH-1, 0, PASTEL_BLUE);
+  color = PASTEL_BLUE;
+  p1.x = 0; p1.y = 0;
+  p2.x = WIDTH-1; p2.y = HEIGHT-1;
+  pastel_draw_line(canvas, &p1, &p2, pastel_monochrome_shader, &context);
+
+  p1.x = 0; p1.y = HEIGHT-1;
+  p2.x = WIDTH-1; p2.y = 0;
+  pastel_draw_line(canvas, &p1, &p2, pastel_monochrome_shader, &context);
 }
 
 void test_fill_triangle(void) {
@@ -221,12 +246,28 @@ void test_draw_line_with_shader(void) {
 
   Color colors[3] = { PASTEL_RED, PASTEL_GREEN, PASTEL_BLUE };
   PastelShaderContext shader_context = pastel_shader_context_create(0, 0, 0, 0, colors);
+
+  Vec2i p1, p2;
+
+  //
   // Middle lines
-  pastel_draw_line_with_shader(canvas, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, line_shader1, &shader_context);
-  pastel_draw_line_with_shader(canvas, 0, HEIGHT / 2, WIDTH-1, HEIGHT / 2, line_shader1, &shader_context);
+  p1.x = WIDTH/2; p1.y = HEIGHT-1;
+  p2.x = WIDTH/2; p2.y = 0;
+  pastel_draw_line(canvas, &p1, &p2, line_shader1, &shader_context);
+
+  p1.x = 0; p1.y = HEIGHT/2;
+  p2.x = WIDTH-1; p2.y = HEIGHT/2;
+  pastel_draw_line(canvas, &p1, &p2, line_shader1, &shader_context);
+
+  //
   // Diagonal lines
-  pastel_draw_line_with_shader(canvas, 0, HEIGHT-1, WIDTH-1, 0, line_shader2, &shader_context);
-  pastel_draw_line_with_shader(canvas, 0, 0, WIDTH-1, HEIGHT-1, line_shader3, &shader_context);
+  p1.x = 0; p1.y = HEIGHT-1;
+  p2.x = WIDTH-1; p2.y = 0;
+  pastel_draw_line(canvas, &p1, &p2, line_shader2, &shader_context);
+
+  p1.x = 0; p1.y = 0;
+  p2.x = WIDTH-1; p2.y = HEIGHT-1;
+  pastel_draw_line(canvas, &p1, &p2, line_shader3, &shader_context);
 }
 
 TestCase test_cases[] = {
