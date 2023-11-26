@@ -56,28 +56,28 @@ bool corners_example(void) {
 
   // Draw background
   context.color = BG_COLOR;
-  pastel_fill(canvas, shader);
+  pastel_fill(&canvas, shader);
 
   // Draw corners
   context.color = FG_COLOR;
   Vec2i pos = {0, 0};
   Vec2ui dim = {10, 10};
-  pastel_fill_rect(canvas, &pos, &dim, shader);
+  pastel_fill_rect(&canvas, &pos, &dim, shader);
 
   pos.x = 0; pos.y = HEIGHT - 10;
-  pastel_fill_rect(canvas, &pos, &dim, shader);
+  pastel_fill_rect(&canvas, &pos, &dim, shader);
 
   pos.x = WIDTH - 10; pos.y = 0;
-  pastel_fill_rect(canvas, &pos, &dim, shader);
+  pastel_fill_rect(&canvas, &pos, &dim, shader);
 
   pos.x = (WIDTH-10)/2; pos.y = (HEIGHT-10)/2;
-  pastel_fill_rect(canvas, &pos, &dim, shader);
+  pastel_fill_rect(&canvas, &pos, &dim, shader);
 
   pos.x = WIDTH-10; pos.y = HEIGHT-10;
-  pastel_fill_rect(canvas, &pos, &dim, shader);
+  pastel_fill_rect(&canvas, &pos, &dim, shader);
 
   // Save to png
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/corners_examples.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/000_corners_examples.png");
   return ok;
 }
 
@@ -89,7 +89,7 @@ bool checker_example(void) {
   PastelShader shader = {pastel_shader_func_monochrome, &context};
 
   context.color = BG_COLOR;
-  pastel_fill(canvas, shader);
+  pastel_fill(&canvas, shader);
 
   size_t cols = 10;
   size_t rect_width = WIDTH / cols;
@@ -107,11 +107,11 @@ bool checker_example(void) {
     pos.y = i * (HEIGHT / rows);
     for (; j < cols; j += 2) {
       pos.x = j * (WIDTH / cols);
-      pastel_fill_rect(canvas, &pos, &dim, shader);
+      pastel_fill_rect(&canvas, &pos, &dim, shader);
     }
   }
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/checker_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/001_checker_example.png");
   return ok;
 }
 
@@ -119,7 +119,7 @@ bool rect_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_fill_rects(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/rect_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/002_rect_example.png");
   return ok;
 }
 
@@ -132,13 +132,13 @@ bool circle_example(void) {
   PastelShader shader = {pastel_shader_func_monochrome, &context};
 
   context.color = BG_COLOR;
-  pastel_fill(canvas, shader);
+  pastel_fill(&canvas, shader);
 
   context.color = FG_COLOR;
   Vec2i pos = {WIDTH/2, HEIGHT/2};
-  pastel_fill_circle(canvas, &pos, 25, shader);
+  pastel_fill_circle(&canvas, &pos, 25, shader);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/circle_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/003_circle_example.png");
   return ok;
 }
 
@@ -146,7 +146,7 @@ bool multi_circles_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_fill_circles(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/multi_circles_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/004_multi_circles_example.png");
   return ok;
 }
 
@@ -154,7 +154,7 @@ bool line_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_draw_lines(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/line_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/005_line_example.png");
   return ok;
 }
 
@@ -162,7 +162,7 @@ bool line_shader_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_draw_lines_with_shaders(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/line_shader_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/006_line_shader_example.png");
   return ok;
 }
 
@@ -170,7 +170,7 @@ bool triangle_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_fill_triangles(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/triangle_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/007_triangle_example.png");
   return ok;
 }
 
@@ -178,7 +178,7 @@ bool gradientx_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_gradientx(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/gradientx_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/008_gradientx_example.png");
   return ok;
 }
 
@@ -186,7 +186,7 @@ bool gradienty_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_gradienty(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/gradienty_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/009_gradienty_example.png");
   return ok;
 }
 
@@ -199,9 +199,9 @@ bool circle_gradientx(void) {
   PastelShaderContextGradient1D context = { PASTEL_RED, PASTEL_YELLOW, p.x-(int)r, p.x+(int)r};
   PastelShader shader = { pastel_shader_func_gradient1dx, &context };
 
-  pastel_fill_circle(canvas, &p, r, shader);
+  pastel_fill_circle(&canvas, &p, r, shader);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/circle_gradientx_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/010_circle_gradientx_example.png");
   return ok;
 }
 

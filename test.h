@@ -26,24 +26,24 @@ void pastel_test_fill_rects(PastelCanvas* canvas) {
   PastelShader shader = {pastel_shader_func_monochrome, &context};
 
   context.color = PASTEL_BLACK;
-  pastel_fill(*canvas, shader);
+  pastel_fill(canvas, shader);
 
   Vec2i pos; Vec2ui dim;
 
   context.color = PASTEL_BLUE;
   pos.x = 0; pos.y = 0;
   dim.x = (canvas->width)/2; dim.y = (canvas->height)/3;
-  pastel_fill_rect(*canvas, &pos, &dim, shader);
+  pastel_fill_rect(canvas, &pos, &dim, shader);
 
   context.color = PASTEL_RED;
   pos.x = (canvas->width)/4; pos.y = (canvas->height)/2;
   dim.x = (2*canvas->width)/3; dim.y = (canvas->height)/2;
-  pastel_fill_rect(*canvas, &pos, &dim, shader);
+  pastel_fill_rect(canvas, &pos, &dim, shader);
 
   context.color = PASTEL_GREEN;
   pos.x = (canvas->width)/3; pos.y = (canvas->height)/4;
   dim.x = (canvas->width)/2; dim.y = (canvas->height)/2;
-  pastel_fill_rect(*canvas, &pos, &dim, shader);
+  pastel_fill_rect(canvas, &pos, &dim, shader);
 }
 
 void pastel_test_fill_circles(PastelCanvas* canvas) {
@@ -51,21 +51,21 @@ void pastel_test_fill_circles(PastelCanvas* canvas) {
   PastelShader shader = {pastel_shader_func_monochrome, &context};
 
   context.color = PASTEL_BLACK;
-  pastel_fill(*canvas, shader);
+  pastel_fill(canvas, shader);
 
   Vec2i pos;
 
   context.color = PASTEL_RED;
   pos.x = 0; pos.y = 0;
-  pastel_fill_circle(*canvas, &pos, canvas->width/2, shader);
+  pastel_fill_circle(canvas, &pos, canvas->width/2, shader);
 
   context.color = PASTEL_GREEN;
   pos.x = (canvas->width)/2; pos.y = (canvas->height)/2;
-  pastel_fill_circle(*canvas, &pos, canvas->width/3, shader);
+  pastel_fill_circle(canvas, &pos, canvas->width/3, shader);
 
   context.color = PASTEL_BLUE;
   pos.x = canvas->width; pos.y = canvas->height;
-  pastel_fill_circle(*canvas, &pos, canvas->height/3, shader);
+  pastel_fill_circle(canvas, &pos, canvas->height/3, shader);
 }
 
 void pastel_test_draw_lines(PastelCanvas* canvas) {
@@ -73,7 +73,7 @@ void pastel_test_draw_lines(PastelCanvas* canvas) {
   PastelShader shader = {pastel_shader_func_monochrome, &context};
 
   context.color = PASTEL_BLACK;
-  pastel_fill(*canvas, shader);
+  pastel_fill(canvas, shader);
 
   Vec2i p1, p2;
 
@@ -82,33 +82,33 @@ void pastel_test_draw_lines(PastelCanvas* canvas) {
   context.color = PASTEL_RED;
   p1.x = 0; p1.y = 0;
   p2.x = 0; p2.y = canvas->height - 1;
-  pastel_draw_line(*canvas, &p1, &p2, shader);
+  pastel_draw_line(canvas, &p1, &p2, shader);
 
   p1.x = canvas->width - 1; p1.y = 0;
   p2.x = canvas->width - 1; p2.y = canvas->height - 1;
-  pastel_draw_line(*canvas, &p1, &p2, shader);
+  pastel_draw_line(canvas, &p1, &p2, shader);
 
   //
   // Middle lines
   context.color = PASTEL_GREEN;
   p1.x = (canvas->width)/2; p1.y = (canvas->height) - 1;
   p2.x = (canvas->width)/2; p2.y = 0;
-  pastel_draw_line(*canvas, &p1, &p2, shader);
+  pastel_draw_line(canvas, &p1, &p2, shader);
 
   p1.x = 0; p1.y = (canvas->height)/2;
   p2.x = canvas->width - 1; p2.y = (canvas->height)/2;
-  pastel_draw_line(*canvas, &p1, &p2, shader);
+  pastel_draw_line(canvas, &p1, &p2, shader);
 
   //
   // Diagonal lines
   context.color = PASTEL_BLUE;
   p1.x = 0; p1.y = 0;
   p2.x = (canvas->width)-1; p2.y = (canvas->height)-1;
-  pastel_draw_line(*canvas, &p1, &p2, shader);
+  pastel_draw_line(canvas, &p1, &p2, shader);
 
   p1.x = 0; p1.y = (canvas->height)-1;
   p2.x = (canvas->width)-1; p2.y = 0;
-  pastel_draw_line(*canvas, &p1, &p2, shader);
+  pastel_draw_line(canvas, &p1, &p2, shader);
 
 }
 
@@ -117,7 +117,7 @@ void pastel_test_draw_lines_with_shaders(PastelCanvas* canvas) {
   PastelShader shader = {pastel_shader_func_monochrome, &context};
 
   context.color = PASTEL_BLACK;
-  pastel_fill(*canvas, shader);
+  pastel_fill(canvas, shader);
 
   Vec2i p1, p2, p3;
 
@@ -125,19 +125,19 @@ void pastel_test_draw_lines_with_shaders(PastelCanvas* canvas) {
   p1.x = 0; p1.y = canvas->height/2;
   p2.x = (canvas->width-1)/2; p2.y = canvas->height-1;
   p3.x = (2*canvas->width)/3; p3.y = 0;
-  pastel_fill_triangle(*canvas, &p1, &p2, &p3, shader);
+  pastel_fill_triangle(canvas, &p1, &p2, &p3, shader);
 
   context.color = PASTEL_GREEN;
   p1.x = 0; p1.y = canvas->height/4;
   p2.x = (2*canvas->width)/3; p2.y = (5*canvas->height)/6;
   p3.x = (3*canvas->width)/4; p3.y = (2*canvas->height)/3;
-  pastel_fill_triangle(*canvas, &p1, &p2, &p3, shader);
+  pastel_fill_triangle(canvas, &p1, &p2, &p3, shader);
 
   context.color = PASTEL_BLUE;
   p1.x = (2*canvas->width)/3; p1.y = canvas->height/4;
   p2.x = canvas->width-1; p2.y = canvas->height/2;
   p3.x = (4*canvas->width)/5; p3.y = (3*canvas->height)/4;
-  pastel_fill_triangle(*canvas, &p1, &p2, &p3, shader);
+  pastel_fill_triangle(canvas, &p1, &p2, &p3, shader);
 }
 
 
@@ -194,7 +194,7 @@ void pastel_test_fill_triangles(PastelCanvas* canvas) {
   PastelShader mono_shader = {pastel_shader_func_monochrome, &mono_context};
 
   mono_context.color = PASTEL_BLACK;
-  pastel_fill(*canvas, mono_shader);
+  pastel_fill(canvas, mono_shader);
 
   Vec2i p1, p2;
 
@@ -206,11 +206,11 @@ void pastel_test_fill_triangles(PastelCanvas* canvas) {
 
   p1.x = canvas->width/2; p1.y = canvas->height-1;
   p2.x = canvas->width/2; p2.y = 0;
-  pastel_draw_line(*canvas, &p1, &p2, shader_middle);
+  pastel_draw_line(canvas, &p1, &p2, shader_middle);
 
   p1.x = 0; p1.y = canvas->height/2;
   p2.x = canvas->width-1; p2.y = canvas->height/2;
-  pastel_draw_line(*canvas, &p1, &p2, shader_middle);
+  pastel_draw_line(canvas, &p1, &p2, shader_middle);
 
   //
   // Diagonal lines
@@ -222,26 +222,26 @@ void pastel_test_fill_triangles(PastelCanvas* canvas) {
   context_diagonal.c1 = PASTEL_RED; context_diagonal.c2 = PASTEL_GREEN;
   p1.x = 0; p1.y = canvas->height-1;
   p2.x = canvas->width-1; p2.y = 0;
-  pastel_draw_line(*canvas, &p1, &p2, shader_diagonal);
+  pastel_draw_line(canvas, &p1, &p2, shader_diagonal);
 
   context_diagonal.c1 = PASTEL_BLUE; context_diagonal.c2 = PASTEL_YELLOW;
   shader_diagonal.run = line_shader_func3;
   p1.x = 0; p1.y = 0;
   p2.x = canvas->width-1; p2.y = canvas->height-1;
-  pastel_draw_line(*canvas, &p1, &p2, shader_diagonal);
+  pastel_draw_line(canvas, &p1, &p2, shader_diagonal);
 }
 
 void pastel_test_gradientx(PastelCanvas* canvas) {
   PastelShaderContextGradient1D context = { PASTEL_RED, PASTEL_GREEN, 0, canvas->width };
   PastelShader shader = { pastel_shader_func_gradient1dx, &context };
-  pastel_fill(*canvas, shader);
+  pastel_fill(canvas, shader);
 
 }
 
 void pastel_test_gradienty(PastelCanvas* canvas) {
   PastelShaderContextGradient1D context = { PASTEL_RED, PASTEL_GREEN, 0, canvas->height };
   PastelShader shader = { pastel_shader_func_gradient1dy, &context };
-  pastel_fill(*canvas, shader);
+  pastel_fill(canvas, shader);
 }
 
 #endif // PASTEL_TEST_IMPLEMENTATION
