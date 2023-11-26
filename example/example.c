@@ -190,6 +190,21 @@ bool gradienty_example(void) {
   return ok;
 }
 
+bool circle_gradientx(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_gradienty(&canvas);
+
+  Vec2i p = { WIDTH/2, HEIGHT/2 };
+  size_t r = { WIDTH/4 } ; 
+  PastelShaderContextGradient1D context = { PASTEL_RED, PASTEL_YELLOW, p.x-(int)r, p.x+(int)r};
+  PastelShader shader = { pastel_shader_func_gradient1dx, &context };
+
+  pastel_fill_circle(canvas, &p, r, shader);
+
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/circle_gradientx_example.png");
+  return ok;
+}
+
 int main (void) {
   if (!corners_example()) return -1;
   if (!checker_example()) return -1;
@@ -201,5 +216,6 @@ int main (void) {
   if (!triangle_example()) return -1;
   if (!gradientx_example()) return -1;
   if (!gradienty_example()) return -1;
+  if (!circle_gradientx()) return -1;
   return 0;
 }
