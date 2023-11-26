@@ -115,12 +115,12 @@ void test_draw_line(void) {
 
 void test_fill_triangle(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-  pastel_test_draw_lines_with_shaders(&canvas);
+  pastel_test_fill_triangles(&canvas);
 }
 
 void test_draw_line_with_shader(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-  pastel_test_fill_triangles(&canvas);
+  pastel_test_draw_lines_with_shaders(&canvas);
 }
 
 void test_gradientx(void) {
