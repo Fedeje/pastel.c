@@ -43,7 +43,8 @@
 // and performs computation on the current pixel.
 // A shader is meant to be applied to every pixel of the image / every pixel of the object being rendered.
 // 
-// TODO: monochrome color shader instead of `Color color` -> avoid duplication of functions...
+// TODO: Color gradient on canvas/rectangle
+// TODO: Rainbow triangle
 // TODO: SDL to have a window instead of png / web thingy
 // TODO: Immediate mode GUI? Like DearImgui (cimgui) or Nuklear
 // TODO: 3D - Projective camera
