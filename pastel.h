@@ -52,7 +52,6 @@
 // and performs computation on the current pixel.
 // A shader is meant to be applied to every pixel of the image / every pixel of the object being rendered.
 // 
-// TODO: Color gradient on canvas/rectangle
 // TODO: 2D color gradient
 // TODO: Rainbow triangle
 // TODO: SDL to have a window instead of png / web thingy
