@@ -60,8 +60,6 @@ PASTELDEF Color pastel_shader_func_monochrome(int x, int y, void* context) {
   return _context->color;
 }
 
-#include <stdio.h>
-
 PASTELDEF Color __pastel_compute_color_grad1d(int v, int vmin, int vmax, Color c1, Color c2) {
   if (v < vmin) v = vmin; if(v > vmax) v = vmax;
 

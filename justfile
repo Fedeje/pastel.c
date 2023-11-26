@@ -8,7 +8,7 @@ compile +FLAGS="":
     # clang example/example.c -fcolor-diagnostics -I. -Wall -Wextra -std=c99 {{FLAGS}} -o ./bin/example
     clang example/example.c -fcolor-diagnostics -I. -I$SDL_INCLUDE -L$SDL_LIB -Wl,-rpath -Wl,$SDL_LIB -lSDL2 -Wall -Wextra -std=c99 {{FLAGS}} -o ./bin/example
     clang test.c -fcolor-diagnostics -I. -Wall -Wextra -std=c99 -lm {{FLAGS}} -o ./bin/test
-    # clang example/triangle.c -I. -Wall -Wextra -Os --target=wasm32 --no-standard-libraries -Wl,--export-all -Wl,--no-entry -Wl,--allow-undefined -o ./bin/triangle.wasm
+    clang example/wasm_triangle.c -I. -Wall -Wextra -Os --target=wasm32 --no-standard-libraries -Wl,--export-all -Wl,--no-entry -Wl,--allow-undefined -o ./bin/triangle.wasm
 
 delete_examples:
     rm -f imgs/*.png

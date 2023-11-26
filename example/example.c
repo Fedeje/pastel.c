@@ -18,7 +18,6 @@
 #include "test.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "third-party/stb_image_write.h"
-#include "SDL2/SDL.h"
 
 #define WIDTH 800
 #define HEIGHT 600
