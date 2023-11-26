@@ -136,27 +136,27 @@ typedef struct {
 // @brief Create a canvas: image with its width, height and stride (width if row-major, height if column-major).
 PASTELDEF PastelCanvas pastel_canvas_create(Color* pixels, size_t pixels_width, size_t pixels_height);
 
-// @brief Fill the entire image buffer with a given color.
+// @brief Fill the entire image buffer with a given shader.
 PASTELDEF void pastel_fill(PastelCanvas* canvas, PastelShader shader);
 
-// @brief Fill a rectangle with a given color.
+// @brief Fill a rectangle with a given shader.
 // A rectangle starts at pixel (x0, y0) and has a width and a height.
 // @param pos the upper left corner of the rectangle
 // @param dim_rect the width and length of the rectangle
 PASTELDEF void pastel_fill_rect(PastelCanvas* canvas, const Vec2i* p, const Vec2ui* dim_rect, PastelShader shader);
 
-// @brief Fill a circle with a given color.
+// @brief Fill a circle with a given shader.
 // A circle has center (x0, y0) and radius r.
 // @param p the center position.
 // @param r the radius.
 PASTELDEF void pastel_fill_circle(PastelCanvas* canvas, const Vec2i* p, size_t r, PastelShader shader);
 
-// @brief Draw a line with a given color.
+// @brief Draw a line with a given shader.
 // A line starts at (x0, y0) and ends at (x1, y1).
 // @param p1 and p2 the two points of the line segment.
 PASTELDEF void pastel_draw_line(PastelCanvas* canvas, const Vec2i* p1, const Vec2i* p2, PastelShader shader);
 
-// @brief Fill a triangle with a given color.
+// @brief Fill a triangle with a given shader.
 // Instead of using aabb and checking if pixels are inside triangle, fill the triangle by drawing it line by line.
 // On the CPU, this version is MUCH faster than the AABB ones above (3x faster).
 // However, in practice, on the GPU, it's the AABB one which is implemented.
@@ -164,7 +164,7 @@ PASTELDEF void pastel_draw_line(PastelCanvas* canvas, const Vec2i* p1, const Vec
 // @param p1, p2 and p3 the triangle vertices.
 PASTELDEF void pastel_fill_triangle(PastelCanvas* canvas, const Vec2i* p1, const Vec2i* p2, const Vec2i* p3, PastelShader shader);
 
-// @brief Fill a triangle with a given color.
+// @brief Fill a triangle with a given shader.
 // A triangle is 3 points (x0, y0), (x1, y1) and (x2, y2)
 // Convention: the triangles are stored counter-clockwise.
 // This function uses aabb to isolate a rectangle of pixels where the triangle lives.
