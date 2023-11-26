@@ -1,6 +1,3 @@
-run TARGET: (compile)
-    ./bin/{{TARGET}}
-
 compile +FLAGS="":
     mkdir -p ./bin/
     mkdir -p ./imgs/
