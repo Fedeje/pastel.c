@@ -38,7 +38,7 @@
 // Here, we'll mainly focus on step 1, but if we have time, we'll
 // also take a look at step 2.
 // 
-// TODO: monochrome color shader instead of `uint32_t color` -> avoid duplication of functions...
+// TODO: monochrome color shader instead of `Color color` -> avoid duplication of functions...
 // TODO: SDL to have a window instead of png / web thingy
 // TODO: Immediate mode GUI? Like DearImgui (cimgui) or Nuklear
 // TODO: 3D - Projective camera
@@ -75,13 +75,17 @@
 #define PASTEL_MAX2(max, x, y) do { max = x; if (max < y) max = y; } while (0)
 #define PASTEL_MAX3(max, x, y, z) do { max = x; if (max < y) max = y; if (max < z) max = z; } while (0)
 #define PASTEL_PIXEL(canvas, x, y) (canvas).pixels[(y) * (canvas).stride + (x)]
-#define PASTEL_SHADER_TYPE(shader) uint32_t (*(shader))(PastelShaderContext*)
+
+typedef uint32_t Color;
+#define PASTEL_SHADER(shader) Color (*(shader))(PastelShaderContext*)
 
 // --------------------------------------
 // -------------- STRUCTS ---------------
 // --------------------------------------
+//
+
 typedef struct {
-  uint32_t* pixels;
+  Color* pixels;
   size_t width;
   size_t height;
   size_t stride;
@@ -95,8 +99,12 @@ typedef struct {
   int y;
   int count;
   size_t color_index;
-  uint32_t* colors;
+  Color* colors;
 } PastelShaderContext;
+
+#define PASTEL_TYPEDEF_VEC2(T, name) typedef struct { T x; T y; } name
+PASTEL_TYPEDEF_VEC2(size_t, Vec2ui);
+PASTEL_TYPEDEF_VEC2(int, Vec2i);
 
 // ----------------------------------------
 // -------------- FUNCTIONS ---------------
@@ -105,42 +113,54 @@ typedef struct {
 #define PASTELDEF static inline
 #endif
 
-//
-// Create a canvas: image with its width, height and stride (width if row-major, height if column-major).
-PASTELDEF PastelCanvas pastel_canvas_create(uint32_t* pixels, size_t pixels_width, size_t pixels_height);
-//
-// Fill the entire image buffer with a given color.
-PASTELDEF void pastel_fill(PastelCanvas canvas, uint32_t color);
-//
-// Fill a rectangle with a given color. A rectangle starts at pixel (x0, y0) and has a width and a height.
-PASTELDEF void pastel_fill_rect(PastelCanvas canvas, int x0, int y0, size_t rect_width, size_t rect_height, uint32_t color);
-//
-// Fill a circle with a given color. A circle has center (x0, y0) and radius r.
-PASTELDEF void pastel_fill_circle(PastelCanvas canvas, int x0, int y0, size_t r, uint32_t color);
-//
-// Draw a line with a given color. A line starts at (x0, y0) and ends at (x1, y1).
-PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int y1, uint32_t color);
-PASTELDEF void pastel_draw_line2(PastelCanvas canvas, int x0, int y0, int x1, int y1, uint32_t color);
-//
-// Draw a line with a given shader.
+// @brief Create a canvas: image with its width, height and stride (width if row-major, height if column-major).
+PASTELDEF PastelCanvas pastel_canvas_create(Color* pixels, size_t pixels_width, size_t pixels_height);
+
+// @brief Monochrome shader.
+PASTELDEF Color pastel_monochrome_shader(PastelShaderContext* context);
+
+// @brief Fill the entire image buffer with a given color.
+PASTELDEF void pastel_fill(PastelCanvas canvas, PASTEL_SHADER(shader), PastelShaderContext* context);
+
+// @brief Fill a rectangle with a given color.
+// A rectangle starts at pixel (x0, y0) and has a width and a height.
+// @param pos the upper left corner of the rectangle
+// @param dim_rect the width and length of the rectangle
+PASTELDEF void pastel_fill_rect(PastelCanvas canvas, const Vec2i* pos, const Vec2ui* dim_rect, PASTEL_SHADER(shader), PastelShaderContext* context);
+
+// @brief Fill a circle with a given color.
+// A circle has center (x0, y0) and radius r.
+PASTELDEF void pastel_fill_circle(PastelCanvas canvas, int x0, int y0, size_t r, Color color);
+
+// @brief Draw a line with a given color.
+// A line starts at (x0, y0) and ends at (x1, y1).
+PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int y1, Color color);
+PASTELDEF void pastel_draw_line2(PastelCanvas canvas, int x0, int y0, int x1, int y1, Color color);
+
+
+// @brief Draw a line with a given shader.
 // A shader is simply a function which takes a context (information about a scene and the pixel at which the shader is computed)
 // and performs computation on the current pixel. A shader is meant to be applied to every pixel of the image / every pixel
 // of the object being rendered.
-PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0, int x1, int y1, PASTEL_SHADER_TYPE(shader), PastelShaderContext* context);
-//
-// Create a shader context. This context contains information on the scene which is relevant to the shader computation.
-PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int count, int color_index, uint32_t* colors);
-//
-// Fill a triangle with a given color. A triangle is 3 points (x0, y0), (x1, y1) and (x2, y2)
+PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0, int x1, int y1, PASTEL_SHADER(shader), PastelShaderContext* context);
+
+// @brief Create a shader context.
+// This context contains information on the scene which is relevant to the shader computation.
+PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int count, int color_index, Color* colors);
+
+// @brief Fill a triangle with a given color.
+// A triangle is 3 points (x0, y0), (x1, y1) and (x2, y2)
 // Convention: the triangles are stored counter-clockwise.
-PASTELDEF void pastel_fill_triangle2_oriented(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color);
-// Same as `pastel_fill_triangle_oriented` but the triangle does not need to have an orientation.
-PASTELDEF void pastel_fill_triangle2(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color);
-//
-// Fill a triangle with a given color. Instead of using aabb and checking if pixels are inside triangle, fill the triangle by drawing it line by line.
-// On the CPU, this version is MUCH faster than the AABB ones above (3x faster). However, in practice, on the GPU, it's the AABB one which is implemented.
+PASTELDEF void pastel_fill_triangle2_oriented(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, Color color);
+// @brief Same as `pastel_fill_triangle_oriented` but the triangle does not need to have an orientation.
+PASTELDEF void pastel_fill_triangle2(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, Color color);
+
+// @brief Fill a triangle with a given color.
+// Instead of using aabb and checking if pixels are inside triangle, fill the triangle by drawing it line by line.
+// On the CPU, this version is MUCH faster than the AABB ones above (3x faster).
+// However, in practice, on the GPU, it's the AABB one which is implemented.
 // This is simply because you can assign each pixel of the AABB to a GPU core. Parallelism changes a lot (benchmarking is very important).
-PASTELDEF void pastel_fill_triangle(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color);
+PASTELDEF void pastel_fill_triangle(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, Color color);
 
 #endif // PASTEL_H_
 
@@ -148,7 +168,7 @@ PASTELDEF void pastel_fill_triangle(PastelCanvas canvas, int x0, int y0, int x1,
 // -------------- PASTEL IMPLEMENTATIONS ---------------
 // -----------------------------------------------------
 #ifdef PASTEL_IMPLEMENTATION
-PASTELDEF PastelCanvas pastel_canvas_create(uint32_t* pixels, size_t pixels_width, size_t pixels_height) {
+PASTELDEF PastelCanvas pastel_canvas_create(Color* pixels, size_t pixels_width, size_t pixels_height) {
   PastelCanvas canvas = {
     .pixels = pixels,
     .width = pixels_width,
@@ -158,27 +178,36 @@ PASTELDEF PastelCanvas pastel_canvas_create(uint32_t* pixels, size_t pixels_widt
   return canvas;
 }
 
-PASTELDEF void pastel_fill(PastelCanvas canvas, uint32_t color) {
-  for (size_t i = 0; i < canvas.width * canvas.height; ++i) {
-    canvas.pixels[i] = color;
+PASTELDEF Color pastel_monochrome_shader(PastelShaderContext* context) {
+  return context->colors[0];
+}
+
+PASTELDEF void pastel_fill(PastelCanvas canvas, PASTEL_SHADER(shader), PastelShaderContext* context) {
+  for (int y = 0; y < (int)canvas.height; ++y) {
+    for (int x = 0; x < (int)canvas.width; ++x) {
+      context->x = x; context->y = y;
+      Color color = shader(context);
+      PASTEL_PIXEL(canvas, x, y) = color;
+    }
   }
 } // function `void pastel_fill`
 
-PASTELDEF void pastel_fill_rect(PastelCanvas canvas, int x0, int y0,
-                                size_t rect_width, size_t rect_height, uint32_t color) {
+PASTELDEF void pastel_fill_rect(PastelCanvas canvas, const Vec2i* pos, const Vec2ui* dim_rect, PASTEL_SHADER(shader), PastelShaderContext* context) {
   // A pixel image is row-major
-  for (int y = y0; y <= y0 + (int)rect_height; ++y) {
+  for (int y = pos->y; y <= pos->y + (int)dim_rect->y; ++y) {
     if (0 <= y && y < (int)canvas.height) {
-      for (int x = x0; x <= x0 + (int)rect_width; ++x) {
+      for (int x = pos->x; x <= pos->x + (int)dim_rect->x; ++x) {
         if (0 <= x && x < (int)canvas.width) {
-        PASTEL_PIXEL(canvas, x, y) =  color;
+          context->x = x; context->y = y;
+          Color color = shader(context);
+          PASTEL_PIXEL(canvas, x, y) =  color;
         }
       }
     }
   }
 }
 
-PASTELDEF void pastel_fill_circle(PastelCanvas canvas, int x0, int y0, size_t r, uint32_t color) {
+PASTELDEF void pastel_fill_circle(PastelCanvas canvas, int x0, int y0, size_t r, Color color) {
   int x0_aabb = x0 - r;
   int y0_aabb = y0 - r;
   int r2 = (int)(r * r);
@@ -197,7 +226,7 @@ PASTELDEF void pastel_fill_circle(PastelCanvas canvas, int x0, int y0, size_t r,
   }
 }
 
-PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int y1, uint32_t color) {
+PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int y1, Color color) {
   if (x0 == x1) {
     // Vertical line
     if (0 <= x0 && x0 < (int)canvas.width) {
@@ -249,7 +278,7 @@ PASTELDEF void pastel_draw_line(PastelCanvas canvas, int x0, int y0, int x1, int
 }
 
 // NOTE: this code is not faster than `pastel_draw_line`.
-PASTELDEF void pastel_draw_line2(PastelCanvas canvas, int x0, int y0, int x1, int y1, uint32_t color) {
+PASTELDEF void pastel_draw_line2(PastelCanvas canvas, int x0, int y0, int x1, int y1, Color color) {
   bool steep = false;
   if (PASTEL_ABS(int, x0 - x1) < PASTEL_ABS(int, y0 - y1)) {
     // The line is too steep meaning an increment of x will lead
@@ -300,7 +329,7 @@ PASTELDEF void pastel_draw_line2(PastelCanvas canvas, int x0, int y0, int x1, in
   }
 }
 
-PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int count, int color_index, uint32_t* colors) {
+PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int count, int color_index, Color* colors) {
   PastelShaderContext context = {
     .x = x,
     .y = y,
@@ -311,7 +340,7 @@ PASTELDEF PastelShaderContext pastel_shader_context_create(int x, int y, int cou
   return context;
 }
 
-PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0, int x1, int y1, PASTEL_SHADER_TYPE(shader), PastelShaderContext* shader_context) {
+PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0, int x1, int y1, PASTEL_SHADER(shader), PastelShaderContext* shader_context) {
   if (x0 == x1) {
     // Vertical line
     if (0 <= x0 && x0 < (int)canvas.width) {
@@ -319,7 +348,7 @@ PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0,
       for (int y = y0; y <= y1; ++y) {
         if (0 <= y && y < (int)canvas.height) {
           shader_context->x = x0; shader_context->y = y;
-          uint32_t color = shader(shader_context);
+          Color color = shader(shader_context);
           PASTEL_PIXEL(canvas, x0, y) =  color;
         }
       }
@@ -331,7 +360,7 @@ PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0,
       for (int x = x0; x <= x1; ++x) {
         if (0 <= x && x < (int)canvas.width) {
           shader_context->x = x; shader_context->y = y0;
-          uint32_t color = shader(shader_context);
+          Color color = shader(shader_context);
           PASTEL_PIXEL(canvas, x, y0) =  color;
         }
       }
@@ -359,7 +388,7 @@ PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0,
         for(int y = ystart; y <= yend; ++y) {
           if (0 <= y && y < (int)canvas.height) {
             shader_context->x = x; shader_context->y = y;
-            uint32_t color = shader(shader_context);
+            Color color = shader(shader_context);
             PASTEL_PIXEL(canvas, x, y) =  color;
           }
         }
@@ -383,7 +412,7 @@ PASTELDEF void pastel_draw_line_with_shader(PastelCanvas canvas, int x0, int y0,
 //       P1
 // The normals n point always outside the triangle, so the triangle goes as:
 // P2 - P0, P1 - P2 and P0 - P1
-PASTELDEF void pastel_fill_triangle2_oriented(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
+PASTELDEF void pastel_fill_triangle2_oriented(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, Color color) {
   int aabb_x0, aabb_y0, aabb_x1, aabb_y1;
   PASTEL_MIN3(aabb_x0, x0, x1, x2);
   PASTEL_MIN3(aabb_y0, y0, y1, y2);
@@ -420,7 +449,7 @@ PASTELDEF void pastel_fill_triangle2_oriented(PastelCanvas canvas, int x0, int y
 
 // Same as `pastel_fill_triangle_oriented` but the triangle does not
 // need to have an orientation.
-PASTELDEF void pastel_fill_triangle2(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
+PASTELDEF void pastel_fill_triangle2(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, Color color) {
   int aabb_x0, aabb_y0, aabb_x1, aabb_y1;
   PASTEL_MIN3(aabb_x0, x0, x1, x2);
   PASTEL_MIN3(aabb_y0, y0, y1, y2);
@@ -448,7 +477,7 @@ PASTELDEF void pastel_fill_triangle2(PastelCanvas canvas, int x0, int y0, int x1
   }
 }
 
-PASTELDEF void pastel_fill_triangle(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
+PASTELDEF void pastel_fill_triangle(PastelCanvas canvas, int x0, int y0, int x1, int y1, int x2, int y2, Color color) {
   if ((y0 == y1 && y0 == y2) || (x0 == x1 && x0 == x2)) return; // degenerate triangle
 
   // Sort the vertices according to the y-axis

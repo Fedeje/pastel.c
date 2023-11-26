@@ -26,7 +26,7 @@
 // This means we index pixels the following:
 //   if `i` is the row and `j` is the column then 
 //   pixels(i, j) <=> pixels[i * height + j]
-static uint32_t pixels[HEIGHT * WIDTH];
+static Color pixels[HEIGHT * WIDTH];
 // Note:
 // If `T array_of_T[50]`; is defined at file scope (outside of all functions)
 // or is static, it's not going to be on the stack, it's going to be a global
@@ -40,18 +40,35 @@ static uint32_t pixels[HEIGHT * WIDTH];
 #define FG_COLOR PASTEL_RED
 
 bool corners_example(void) {
-  // initialize buffer with bg color
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-  pastel_fill(canvas, BG_COLOR);
-  pastel_fill_rect(canvas, 0, 0, 10, 10, FG_COLOR);
-  pastel_fill_rect(canvas, 0, HEIGHT - 10, 10, 10, FG_COLOR);
-  pastel_fill_rect(canvas, WIDTH - 10, 0, 10, 10, FG_COLOR);
-  pastel_fill_rect(canvas, (WIDTH - 10) / 2, (HEIGHT - 10) / 2, 10, 10, FG_COLOR);
-  pastel_fill_rect(canvas, WIDTH - 10, HEIGHT - 10, 10, 10, FG_COLOR);
 
+  // Draw background
+  Color color = BG_COLOR;
+  PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &color);
+  pastel_fill(canvas, pastel_monochrome_shader, &context);
+
+  // Draw corners
+  color = FG_COLOR;
+  Vec2i pos = {0, 0};
+  Vec2ui dim = {10, 10};
+  pastel_fill_rect(canvas, &pos, &dim, pastel_monochrome_shader, &context);
+
+  pos.x = 0; pos.y = HEIGHT - 10;
+  pastel_fill_rect(canvas, &pos, &dim, pastel_monochrome_shader, &context);
+
+  pos.x = WIDTH - 10; pos.y = 0;
+  pastel_fill_rect(canvas, &pos, &dim, pastel_monochrome_shader, &context);
+
+  pos.x = (WIDTH-10)/2; pos.y = (HEIGHT-10)/2;
+  pastel_fill_rect(canvas, &pos, &dim, pastel_monochrome_shader, &context);
+
+  pos.x = WIDTH-10; pos.y = HEIGHT-10;
+  pastel_fill_rect(canvas, &pos, &dim, pastel_monochrome_shader, &context);
+
+  // Save to png
   const char* file_path = IMGS_DIR_PATH"/corners_examples.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -61,7 +78,10 @@ bool corners_example(void) {
 bool checker_example(void) {
   // initialize buffer with bg color
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-  pastel_fill(canvas, BG_COLOR);
+
+  Color bg_color = BG_COLOR;
+  PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &bg_color);
+  pastel_fill(canvas, pastel_monochrome_shader, &context);
 
   size_t cols = 10;
   size_t rect_width = WIDTH / cols;
@@ -69,20 +89,24 @@ bool checker_example(void) {
   size_t rect_height = HEIGHT / rows;
   // Pixel at col m, row n is at pos (m * WIDTH/cols, n * HEIGHT/rows)
 
+  Color fg_color = FG_COLOR;
+  context.colors = &fg_color;
+  Vec2i pos;
+  Vec2ui dim = {rect_width, rect_height};
   for (size_t i = 0; i < rows; ++i) {
     size_t j = 0;
     if (i % 2 == 1) { j = 1; }
 
-    size_t y0 = i * (HEIGHT / rows);
+    pos.y = i * (HEIGHT / rows);
     for (; j < cols; j += 2) {
-      size_t x0 = j * (WIDTH / cols);
-      pastel_fill_rect(canvas, x0, y0, rect_width, rect_height, FG_COLOR);
+      pos.x = j * (WIDTH / cols);
+      pastel_fill_rect(canvas, &pos, &dim, pastel_monochrome_shader, &context);
     }
   }
 
   const char* file_path = IMGS_DIR_PATH"/checker_example.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -92,12 +116,15 @@ bool checker_example(void) {
 bool circle_example(void) {
   // initialize buffer with bg color
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-  pastel_fill(canvas, BG_COLOR);
+
+  Color bg_color = BG_COLOR;
+  PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &bg_color);
+  pastel_fill(canvas, pastel_monochrome_shader, &context);
 
   pastel_fill_circle(canvas, WIDTH / 2, HEIGHT / 2, 25, FG_COLOR);
   const char* file_path = IMGS_DIR_PATH"/circle_example.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -106,7 +133,11 @@ bool circle_example(void) {
 
 bool line_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-  pastel_fill(canvas, PASTEL_BLACK);
+
+  Color bg_color = BG_COLOR;
+  PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &bg_color);
+  pastel_fill(canvas, pastel_monochrome_shader, &context);
+
   // Side lines
   pastel_draw_line(canvas, 0, 0, 0, HEIGHT-1, PASTEL_RED);
   pastel_draw_line(canvas, WIDTH-1, 0, WIDTH-1, HEIGHT-1, PASTEL_RED);
@@ -119,33 +150,33 @@ bool line_example(void) {
 
   const char* file_path = IMGS_DIR_PATH"/line_example.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
   return true;
 }
 
-uint32_t line_shader1(PastelShaderContext* shader_param) {
-  if (shader_param->count == 10) {
-    shader_param->color_index++;
-    if (shader_param->color_index > 2) shader_param->color_index = 0;
-    shader_param->count = 0;
+PASTELDEF Color line_shader1(PastelShaderContext* shader_context) {
+  if (shader_context->count == 10) {
+    shader_context->color_index++;
+    if (shader_context->color_index > 2) shader_context->color_index = 0;
+    shader_context->count = 0;
   } else {
-    shader_param->count++;
+    shader_context->count++;
   }
-  return shader_param->colors[shader_param->color_index];
+  return shader_context->colors[shader_context->color_index];
 }
 
-uint32_t line_shader2(PastelShaderContext* shader_param) {
-  if (shader_param->x < WIDTH/2) {
+PASTELDEF Color line_shader2(PastelShaderContext* shader_context) {
+  if (shader_context->x < WIDTH/2) {
     return PASTEL_RED;
   }
   return PASTEL_GREEN;
 }
 
-uint32_t line_shader3(PastelShaderContext* shader_param) {
-  if (shader_param->y < HEIGHT/2) {
+PASTELDEF Color line_shader3(PastelShaderContext* shader_context) {
+  if (shader_context->y < HEIGHT/2) {
     return PASTEL_BLUE;
   }
   return PASTEL_YELLOW;
@@ -153,9 +184,12 @@ uint32_t line_shader3(PastelShaderContext* shader_param) {
 
 bool line_shader_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-  pastel_fill(canvas, PASTEL_BLACK);
 
-  uint32_t colors[3] = { PASTEL_RED, PASTEL_GREEN, PASTEL_BLUE };
+  Color bg_color = BG_COLOR;
+  PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &bg_color);
+  pastel_fill(canvas, pastel_monochrome_shader, &context);
+
+  Color colors[3] = { PASTEL_RED, PASTEL_GREEN, PASTEL_BLUE };
   PastelShaderContext shader_context = pastel_shader_context_create(0, 0, 0, 0, colors);
   // Middle lines
   pastel_draw_line_with_shader(canvas, WIDTH / 2, HEIGHT-1, WIDTH / 2, 0, line_shader1, &shader_context);
@@ -166,7 +200,7 @@ bool line_shader_example(void) {
 
   const char* file_path = IMGS_DIR_PATH"/line_shader_example.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -175,7 +209,11 @@ bool line_shader_example(void) {
 
 bool triangle_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-  pastel_fill(canvas, PASTEL_BLACK);
+
+  Color bg_color = BG_COLOR;
+  PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &bg_color);
+  pastel_fill(canvas, pastel_monochrome_shader, &context);
+
   pastel_fill_triangle(canvas,
                       0, HEIGHT / 2,
                       (WIDTH-1)/2, HEIGHT-1,
@@ -193,7 +231,7 @@ bool triangle_example(void) {
                       PASTEL_BLUE);
   const char* file_path = IMGS_DIR_PATH"/triangle_example.png";
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(uint32_t))) {
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
