@@ -48,7 +48,7 @@ bool save_canvas_to_png(const PastelCanvas* canvas, const char* file_path) {
   return true;
 }
 
-bool corners_example(void) {
+bool example_corners(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
 
   PastelShaderContextMonochrome context;
@@ -81,7 +81,7 @@ bool corners_example(void) {
   return ok;
 }
 
-bool checker_example(void) {
+bool example_checker(void) {
   // initialize buffer with bg color
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
 
@@ -115,7 +115,7 @@ bool checker_example(void) {
   return ok;
 }
 
-bool rect_example(void) {
+bool example_rect(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_fill_rects(&canvas);
 
@@ -124,7 +124,7 @@ bool rect_example(void) {
 }
 
 
-bool circle_example(void) {
+bool example_circle(void) {
   // initialize buffer with bg color
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
 
@@ -142,7 +142,7 @@ bool circle_example(void) {
   return ok;
 }
 
-bool multi_circles_example(void) {
+bool example_multi_circles(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_fill_circles(&canvas);
 
@@ -150,7 +150,7 @@ bool multi_circles_example(void) {
   return ok;
 }
 
-bool line_example(void) {
+bool example_line(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_draw_lines(&canvas);
 
@@ -158,7 +158,7 @@ bool line_example(void) {
   return ok;
 }
 
-bool line_shader_example(void) {
+bool example_line_shader(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_draw_lines_with_shaders(&canvas);
 
@@ -166,7 +166,7 @@ bool line_shader_example(void) {
   return ok;
 }
 
-bool triangle_example(void) {
+bool example_triangle(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_fill_triangles(&canvas);
 
@@ -174,7 +174,7 @@ bool triangle_example(void) {
   return ok;
 }
 
-bool gradientx_example(void) {
+bool example_gradientx(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_gradientx(&canvas);
 
@@ -182,7 +182,7 @@ bool gradientx_example(void) {
   return ok;
 }
 
-bool gradienty_example(void) {
+bool example_gradienty(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_gradienty(&canvas);
 
@@ -190,7 +190,7 @@ bool gradienty_example(void) {
   return ok;
 }
 
-bool circle_gradientx(void) {
+bool example_circle_gradientx(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_gradienty(&canvas);
 
@@ -206,16 +206,16 @@ bool circle_gradientx(void) {
 }
 
 int main (void) {
-  if (!corners_example()) return -1;
-  if (!checker_example()) return -1;
-  if (!rect_example()) return -1;
-  if (!circle_example()) return -1;
-  if (!multi_circles_example()) return -1;
-  if (!line_example()) return -1;
-  if (!line_shader_example()) return -1;
-  if (!triangle_example()) return -1;
-  if (!gradientx_example()) return -1;
-  if (!gradienty_example()) return -1;
-  if (!circle_gradientx()) return -1;
+  if (!example_corners()) return -1;
+  if (!example_checker()) return -1;
+  if (!example_rect()) return -1;
+  if (!example_circle()) return -1;
+  if (!example_multi_circles()) return -1;
+  if (!example_line()) return -1;
+  if (!example_line_shader()) return -1;
+  if (!example_triangle()) return -1;
+  if (!example_gradientx()) return -1;
+  if (!example_gradienty()) return -1;
+  if (!example_circle_gradientx()) return -1;
   return 0;
 }
