@@ -59,8 +59,7 @@
 // TODO: 3D - Projective camera
 // TODO: Load mesh model
 // TODO: z-buffer
-// TODO: super-sampling for lines
-// TODO: super-sampling for triangles
+// TODO: anti-aliasing for lines, triangles, circles
 // TODO: font
 // TODO: terminal rendering
 // TODO: bezier curves
