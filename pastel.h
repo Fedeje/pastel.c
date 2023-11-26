@@ -74,6 +74,7 @@
 #define PASTEL_BLUE   0xFFE86056
 #define PASTEL_YELLOW 0xFF3EF0AF
 #define PASTEL_BLACK  0xFF3A3C45
+#define PASTEL_WHITE  0xFFFFFFFF
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -133,11 +134,23 @@ typedef struct {
 // ----------------------------------------
 // -------------- FUNCTIONS ---------------
 // ----------------------------------------
+
 // @brief Create a canvas: image with its width, height and stride (width if row-major, height if column-major).
 PASTELDEF PastelCanvas pastel_canvas_create(Color* pixels, size_t pixels_width, size_t pixels_height);
 
+// @brief Alpha-blends two colors.
+// See https://fr.wikipedia.org/wiki/Alpha_blending
+// @param c1 the color of object on the lower layer
+// @param c2 the color of object on the upper layer
+PASTELDEF void pastel_blend_colors(Color* c1, Color c2);
+
 // @brief Fill the entire image buffer with a given shader.
+// This function does *not* blend with the existing canvas.
+// It replaces each pixel of the canvas according to the @param shader.
 PASTELDEF void pastel_fill(PastelCanvas* canvas, PastelShader shader);
+
+// @brief Same as `pastel_fill` but blends with the existing canvas
+PASTELDEF void pastel_fill_blend(PastelCanvas* canvas, PastelShader shader);
 
 // @brief Fill a rectangle with a given shader.
 // A rectangle starts at pixel (x0, y0) and has a width and a height.
@@ -193,11 +206,39 @@ PASTELDEF PastelCanvas pastel_canvas_create(Color* pixels, size_t pixels_width, 
   return canvas;
 }
 
+PASTELDEF void pastel_blend_colors(Color* c1, Color c2) {
+  Color c1r = PASTEL_RED_CHANNEL(*c1);
+  Color c2r = PASTEL_RED_CHANNEL(c2);
+
+  Color c1g = PASTEL_GREEN_CHANNEL(*c1);
+  Color c2g = PASTEL_GREEN_CHANNEL(c2);
+
+  Color c1b = PASTEL_BLUE_CHANNEL(*c1);
+  Color c2b = PASTEL_BLUE_CHANNEL(c2);
+
+  Color c1a = PASTEL_ALPHA_CHANNEL(*c1);
+  Color c2a = PASTEL_ALPHA_CHANNEL(c2);
+
+  c1r  = (c2r*c2a + c1r*(255-c2a))/255; if (c1r > 255) c1r = 255;
+  c1g  = (c2g*c2a + c1g*(255-c2a))/255; if (c1g > 255) c1g = 255;
+  c1b  = (c2b*c2a + c1b*(255-c2a))/255; if (c1b > 255) c1b = 255;
+  *c1 = PASTEL_RGBA(c1r, c1g, c1b, c1a);
+}
+
 PASTELDEF void pastel_fill(PastelCanvas* canvas, PastelShader shader) {
   for (int y = 0; y < (int)canvas->height; ++y) {
     for (int x = 0; x < (int)canvas->width; ++x) {
       Color color = shader.run(x, y, shader.context);
       PASTEL_PIXEL(canvas, x, y) = color;
+    }
+  }
+} // function `void pastel_fill`
+
+PASTELDEF void pastel_fill_blend(PastelCanvas* canvas, PastelShader shader) {
+  for (int y = 0; y < (int)canvas->height; ++y) {
+    for (int x = 0; x < (int)canvas->width; ++x) {
+      Color color = shader.run(x, y, shader.context);
+      pastel_blend_colors(&PASTEL_PIXEL(canvas, x, y), color);
     }
   }
 } // function `void pastel_fill`
@@ -209,7 +250,7 @@ PASTELDEF void pastel_fill_rect(PastelCanvas* canvas, const Vec2i* p, const Vec2
       for (int x = p->x; x <= p->x + (int)dim_rect->x; ++x) {
         if (0 <= x && x < (int)canvas->width) {
           Color color = shader.run(x, y, shader.context);
-          PASTEL_PIXEL(canvas, x, y) =  color;
+          pastel_blend_colors(&PASTEL_PIXEL(canvas, x, y), color);
         }
       }
     }
@@ -228,8 +269,7 @@ PASTELDEF void pastel_fill_circle(PastelCanvas* canvas, const Vec2i* p, size_t r
           int dist_to_center_x2 = (x - p->x) * (x - p->x);
           if ((dist_to_center_x2 + dist_to_center_y2) <= r2) {
             Color color = shader.run(x, y, shader.context);
-            PASTEL_PIXEL(canvas, x, y) =  color;
-
+            pastel_blend_colors(&PASTEL_PIXEL(canvas, x, y), color);
           }
         }
       }
@@ -247,8 +287,7 @@ PASTELDEF void pastel_draw_line(PastelCanvas* canvas, const Vec2i* p1, const Vec
       for (int y = y0; y <= y1; ++y) {
         if (0 <= y && y < (int)canvas->height) {
           Color color = shader.run(x0, y, shader.context);
-          PASTEL_PIXEL(canvas, x0, y) =  color;
-
+          pastel_blend_colors(&PASTEL_PIXEL(canvas, x0, y), color);
         }
       }
     }
@@ -259,8 +298,7 @@ PASTELDEF void pastel_draw_line(PastelCanvas* canvas, const Vec2i* p1, const Vec
       for (int x = x0; x <= x1; ++x) {
         if (0 <= x && x < (int)canvas->width) {
           Color color = shader.run(x, y0, shader.context);
-          PASTEL_PIXEL(canvas, x, y0) =  color;
-
+          pastel_blend_colors(&PASTEL_PIXEL(canvas, x, y0), color);
         }
       }
     }
@@ -287,8 +325,7 @@ PASTELDEF void pastel_draw_line(PastelCanvas* canvas, const Vec2i* p1, const Vec
         for(int y = ystart; y <= yend; ++y) {
           if (0 <= y && y < (int)canvas->height) {
             Color color = shader.run(x, y, shader.context);
-            PASTEL_PIXEL(canvas, x, y) =  color;
-
+            pastel_blend_colors(&PASTEL_PIXEL(canvas, x, y), color);
           }
         }
       }
@@ -343,7 +380,7 @@ PASTELDEF void pastel_fill_triangle2_oriented(PastelCanvas* canvas, const Vec2i*
           d3 = (x - x1) * (y1 - y0) + (y - y1) * (x0 - x1);
           if (d3 < 0) continue;
           Color color = shader.run(x, y, shader.context);
-          PASTEL_PIXEL(canvas, x, y) =  color;
+          pastel_blend_colors(&PASTEL_PIXEL(canvas, x, y), color);
 
         }
       }
@@ -380,8 +417,7 @@ PASTELDEF void pastel_fill_triangle2(PastelCanvas* canvas, const Vec2i* p1, cons
           bool has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
           if (!(has_neg && has_pos)) {
             Color color = shader.run(x, y, shader.context);
-            PASTEL_PIXEL(canvas, x, y) =  color;
-
+            pastel_blend_colors(&PASTEL_PIXEL(canvas, x, y), color);
           }
         }
       }
@@ -413,8 +449,7 @@ PASTELDEF void pastel_fill_triangle(PastelCanvas* canvas, const Vec2i* p1, const
       for (int x = xl1; x <= xl2; ++x) {
         if (0 <= x && x < (int)canvas->width) {
           Color color = shader.run(x, y, shader.context);
-          PASTEL_PIXEL(canvas, x, y) =  color;
-
+          pastel_blend_colors(&PASTEL_PIXEL(canvas, x, y), color);
         }
       }
     }
@@ -433,7 +468,7 @@ PASTELDEF void pastel_fill_triangle(PastelCanvas* canvas, const Vec2i* p1, const
       for (int x = xl1; x <= xl2; ++x) {
         if (0 <= x && x < (int)canvas->width) {
           Color color = shader.run(x, y, shader.context);
-          PASTEL_PIXEL(canvas, x, y) =  color;
+          pastel_blend_colors(&PASTEL_PIXEL(canvas, x, y), color);
         }
       }
     }

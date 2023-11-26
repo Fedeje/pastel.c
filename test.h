@@ -240,4 +240,21 @@ void pastel_test_gradienty(PastelCanvas* canvas) {
   pastel_fill(canvas, shader);
 }
 
+void pastel_test_alpha_blending(PastelCanvas* canvas) {
+  __fill_bg(canvas, PASTEL_WHITE);
+
+  PastelShaderContextMonochrome context;
+  PastelShader shader = { pastel_shader_func_monochrome, &context };
+
+  Vec2i pcircle = { canvas->width/3, canvas->height/3 };
+  size_t r = { canvas->width/4 } ; 
+  context.color = PASTEL_RGBA(255, 0, 0, 120);
+  pastel_fill_circle(canvas, &pcircle, r, shader);
+
+  context.color = PASTEL_RGBA(0, 255, 0, 80);
+  Vec2i prect = { canvas->width/3, canvas->height/3 };
+  Vec2ui dim = { canvas->width/2, canvas->height/2 };
+  pastel_fill_rect(canvas, &prect, &dim, shader);
+}
+
 #endif // PASTEL_TEST_IMPLEMENTATION

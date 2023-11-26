@@ -133,6 +133,11 @@ void test_gradienty(void) {
   pastel_test_gradienty(&canvas);
 }
 
+void test_alpha_blending(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_alpha_blending(&canvas);
+}
+
 TestCase test_cases[] = {
   DEFINE_TEST_CASE(test_fill_rect),
   DEFINE_TEST_CASE(test_fill_circle),
@@ -141,6 +146,7 @@ TestCase test_cases[] = {
   DEFINE_TEST_CASE(test_draw_line_with_shader),
   DEFINE_TEST_CASE(test_gradientx),
   DEFINE_TEST_CASE(test_gradienty),
+  DEFINE_TEST_CASE(test_alpha_blending),
 };
 
 #define TESTS_CASES_COUNT (sizeof(test_cases) / sizeof(test_cases[0]))

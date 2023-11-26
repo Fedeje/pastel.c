@@ -194,7 +194,15 @@ bool example_circle_gradientx(void) {
 
   pastel_fill_circle(&canvas, &p, r, shader);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/010_circle_gradientx_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/010_example_circle_gradientx.png");
+  return ok;
+}
+
+bool example_alpha_blending(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_alpha_blending(&canvas);
+
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/011_example_alpha_blending.png");
   return ok;
 }
 
@@ -210,5 +218,6 @@ int main (void) {
   if (!example_gradientx()) return -1;
   if (!example_gradienty()) return -1;
   if (!example_circle_gradientx()) return -1;
+  if (!example_alpha_blending()) return -1;
   return 0;
 }

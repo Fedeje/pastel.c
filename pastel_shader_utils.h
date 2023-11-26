@@ -67,19 +67,19 @@ PASTELDEF Color __pastel_compute_color_grad1d(int v, int vmin, int vmax, Color c
 
   Color c1_red = PASTEL_RED_CHANNEL(c1);
   Color c2_red = PASTEL_RED_CHANNEL(c2);
-  Color c_red  = ((vmax-v)*c1_red + (v-vmin)*c2_red)/(vmax-vmin);
+  Color c_red  = ((vmax-v)*c1_red + (v-vmin)*c2_red)/(vmax-vmin); if (c_red > 255) c_red = 255;
 
   Color c1_green = PASTEL_GREEN_CHANNEL(c1);
   Color c2_green = PASTEL_GREEN_CHANNEL(c2);
-  Color c_green  = ((vmax-v)*c1_green + (v-vmin)*c2_green)/(vmax-vmin);
+  Color c_green  = ((vmax-v)*c1_green + (v-vmin)*c2_green)/(vmax-vmin); if (c_green > 255) c_green = 255;
 
   Color c1_blue = PASTEL_BLUE_CHANNEL(c1);
   Color c2_blue = PASTEL_BLUE_CHANNEL(c2);
-  Color c_blue  = ((vmax-v)*c1_blue + (v-vmin)*c2_blue)/(vmax-vmin);
+  Color c_blue  = ((vmax-v)*c1_blue + (v-vmin)*c2_blue)/(vmax-vmin); if (c_blue > 255) c_blue = 255;
 
   Color c1_alpha = PASTEL_ALPHA_CHANNEL(c1);
   Color c2_alpha = PASTEL_ALPHA_CHANNEL(c2);
-  Color c_alpha  = ((vmax-v)*c1_alpha + (v-vmin)*c2_alpha)/(vmax-vmin);
+  Color c_alpha  = ((vmax-v)*c1_alpha + (v-vmin)*c2_alpha)/(vmax-vmin); if (c_alpha > 255) c_alpha = 255;
 
   Color color = PASTEL_RGBA(c_red, c_green, c_blue, c_alpha);
   return color;
