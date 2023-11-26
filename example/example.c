@@ -74,7 +74,7 @@ bool example_corners(void) {
   pastel_fill_rect(&canvas, &pos, &dim, shader);
 
   // Save to png
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/000_corners_examples.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/000_example_corners.png");
   return ok;
 }
 
@@ -106,7 +106,7 @@ bool example_checker(void) {
     }
   }
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/001_checker_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/001_example_checker.png");
   return ok;
 }
 
@@ -114,7 +114,7 @@ bool example_rect(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_fill_rects(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/002_rect_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/002_example_rect.png");
   return ok;
 }
 
@@ -131,7 +131,7 @@ bool example_circle(void) {
   Vec2i pos = {WIDTH/2, HEIGHT/2};
   pastel_fill_circle(&canvas, &pos, 25, shader);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/003_circle_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/003_example_circle.png");
   return ok;
 }
 
@@ -139,7 +139,7 @@ bool example_multi_circles(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_fill_circles(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/004_multi_circles_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/004_example_multi_circles.png");
   return ok;
 }
 
@@ -147,7 +147,7 @@ bool example_line(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_draw_lines(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/005_line_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/005_example_line.png");
   return ok;
 }
 
@@ -155,7 +155,7 @@ bool example_line_shader(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_draw_lines_with_shaders(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/006_line_shader_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/006_example_line_shader.png");
   return ok;
 }
 
@@ -163,7 +163,7 @@ bool example_triangle(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_fill_triangles(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/007_triangle_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/007_example_triangle.png");
   return ok;
 }
 
@@ -171,7 +171,7 @@ bool example_gradientx(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_gradientx(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/008_gradientx_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/008_example_gradientx.png");
   return ok;
 }
 
@@ -179,7 +179,7 @@ bool example_gradienty(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   pastel_test_gradienty(&canvas);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/009_gradienty_example.png");
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/009_example_gradienty.png");
   return ok;
 }
 
