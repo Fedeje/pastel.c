@@ -18,6 +18,11 @@ CompileFlags:
     Add: [-DPASTEL_TEST_IMPLEMENTATION]
 ---
 If:
+    PathMatch: pastel_shader_utils.h
+CompileFlags:
+    Add: [-DPASTEL_SHADER_UTILS_IMPLEMENTATION]
+---
+If:
     PathMatch: third-party/stb_image.h
 CompileFlags:
     Add: [-DSTB_IMAGE_IMPLEMENTATION]

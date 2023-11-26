@@ -53,6 +53,7 @@
 // A shader is meant to be applied to every pixel of the image / every pixel of the object being rendered.
 // 
 // TODO: Color gradient on canvas/rectangle
+// TODO: 2D color gradient
 // TODO: Rainbow triangle
 // TODO: SDL to have a window instead of png / web thingy
 // TODO: Immediate mode GUI? Like DearImgui (cimgui) or Nuklear
@@ -124,15 +125,6 @@ typedef struct {
   void* context;
 } PastelShader;
 
-// 
-// Collection of reccuring usefull shaders and their context
-//
-typedef struct {
-  Color color;
-} PastelShaderContextMonochrome;
-
-PASTELDEF Color pastel_shader_func_monochrome(int x, int y, void* context);
-
 // ----------------------------------------
 // -------------- FUNCTIONS ---------------
 // ----------------------------------------
@@ -180,10 +172,12 @@ PASTELDEF void pastel_fill_triangle2(PastelCanvas canvas, const Vec2i* p1, const
 
 #endif // PASTEL_H_
 
+
 // -----------------------------------------------------
 // -------------- PASTEL IMPLEMENTATIONS ---------------
 // -----------------------------------------------------
 #ifdef PASTEL_IMPLEMENTATION
+
 PASTELDEF PastelCanvas pastel_canvas_create(Color* pixels, size_t pixels_width, size_t pixels_height) {
   PastelCanvas canvas = {
     .pixels = pixels,
@@ -192,12 +186,6 @@ PASTELDEF PastelCanvas pastel_canvas_create(Color* pixels, size_t pixels_width, 
     .stride = pixels_width
   };
   return canvas;
-}
-
-PASTELDEF Color pastel_shader_func_monochrome(int x, int y, void* context) {
-  PASTEL_UNUSED(x); PASTEL_UNUSED(y);
-  PastelShaderContextMonochrome* _context = (PastelShaderContextMonochrome*)context;
-  return _context->color;
 }
 
 PASTELDEF void pastel_fill(PastelCanvas canvas, PastelShader shader) {

@@ -1,6 +1,11 @@
 #ifndef PASTEL_TEST_H_
 #define PASTEL_TEST_H_
 
+// Warning: order of header import is important here!
+// The header `pastel_shader_utils.h` uses `pastel.h`.
+// However, `pastel.h` can be used on its own.
+#define PASTEL_SHADER_UTILS_IMPLEMENTATION
+#include "pastel_shader_utils.h"
 #define PASTEL_IMPLEMENTATION
 #include "pastel.h"
 
