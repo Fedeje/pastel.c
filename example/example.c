@@ -42,7 +42,7 @@ static Color pixels[HEIGHT * WIDTH];
 
 bool save_canvas_to_png(const PastelCanvas* canvas, const char* file_path) {
   printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas->pixels, WIDTH*sizeof(Color))) {
+  if (!stbi_write_png(file_path, canvas->width, canvas->height, 4, canvas->pixels, canvas->stride*sizeof(Color))) {
       fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
       return false;
   }
@@ -196,8 +196,7 @@ bool example_circle_gradientx(void) {
   pastel_fill_circle(&canvas, &p, r, shader);
 
   bool ok1 = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/010_example_circle_gradientx.png");
-  bool ok2 = save_canvas_to_png(&canvas, ASSETS_DIR_PATH"/pastel.png");
-  return ok1&ok2;
+  return ok1;
 }
 
 bool example_alpha_blending(void) {
@@ -206,6 +205,22 @@ bool example_alpha_blending(void) {
 
   bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/011_example_alpha_blending.png");
   return ok;
+}
+
+static Color asset_pixels[1920 * 1080];
+bool asset_circle_gradientx(void) {
+  PastelCanvas canvas = pastel_canvas_create(asset_pixels, 1920, 1080);
+  pastel_test_gradienty(&canvas);
+
+  Vec2i p = { canvas.width/2, canvas.height/2 };
+  size_t r = { canvas.width/4 } ; 
+  PastelShaderContextGradient1D context = { PASTEL_RED, PASTEL_YELLOW, p.x-(int)r, p.x+(int)r};
+  PastelShader shader = { pastel_shader_func_gradient1dx, &context };
+
+  pastel_fill_circle(&canvas, &p, r, shader);
+
+  bool ok1 = save_canvas_to_png(&canvas, ASSETS_DIR_PATH"/pastel.png");
+  return ok1;
 }
 
 int main (void) {
@@ -221,5 +236,6 @@ int main (void) {
   if (!example_gradienty()) return -1;
   if (!example_circle_gradientx()) return -1;
   if (!example_alpha_blending()) return -1;
+  if (!asset_circle_gradientx()) return -1;
   return 0;
 }

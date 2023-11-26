@@ -1,14 +1,16 @@
+#define PASTEL_SHADER_UTILS_IMPLEMENTATION
+#include "pastel_shader_utils.h"
 #define PASTEL_IMPLEMENTATION
 #include "pastel.h"
+#include "SDL2/SDL.h"
 
 #define WIDTH 800
 #define HEIGHT 600
 #define PI 3.1416
 static Color pixels[WIDTH * HEIGHT];
-static Color color_black = PASTEL_BLACK;
-static PastelShaderContext bg_context = {0, 0, 0, 0, &color_black};
-static Color color_red = PASTEL_RED;
-static PastelShaderContext triangle_context = {0, 0, 0, 0, &color_red};
+static PastelShaderContextGradient1D context_grad;
+static PastelShader shader_grady = { pastel_shader_func_gradient1dy, &context_grad };
+static PastelShader shader_gradx = { pastel_shader_func_gradient1dx, &context_grad };
 
 static float angle = 0.0;
 static float freq = 0.1;
@@ -18,13 +20,13 @@ float atan2f(float y, float x);
 float sinf(float x);
 float cosf(float x);
 
-void rotate_point(int* x_, int* y_) {
-  int x = *x_ - WIDTH/2;
-  int y = *y_ - HEIGHT/2;
+void rotate_point(Vec2i* p) {
+  int x = p->x - WIDTH/2;
+  int y = p->y - HEIGHT/2;
   float norm  = sqrtf(x*x + y*y);
   float theta = atan2f(y, x) + angle;
-  *x_ = (cosf(theta)*norm + (float)WIDTH/2); 
-  *y_ = (sinf(theta)*norm + (float)HEIGHT/2);
+  p->x = (cosf(theta)*norm + (float)WIDTH/2); 
+  p->y = (sinf(theta)*norm + (float)HEIGHT/2);
 }
 
 Color* render(float dt) {
@@ -33,15 +35,31 @@ Color* render(float dt) {
 
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   {
-    pastel_fill(canvas, pastel_monochrome_shader, &bg_context);
-    int x0 = 0; int y0 = HEIGHT/2;
-    int x1 = WIDTH*2/3; int y1 = HEIGHT*5/6;
-    int x2 = WIDTH*3/4; int y2 = 0;
-    rotate_point(&x0, &y0);
-    rotate_point(&x1, &y1);
-    rotate_point(&x2, &y2);
-    pastel_fill_triangle(canvas, x0, y0, x1, y1, x2, y2, PASTEL_RED);
+    context_grad.c1 = PASTEL_BLUE;
+    context_grad.c2 = PASTEL_YELLOW;
+    context_grad.min = 0;
+    context_grad.max = HEIGHT;
+    pastel_fill(&canvas, shader_grady);
+
+    // Rotate points
+    Vec2i p1, p2, p3;
+    p1.x = 0; p1.y = HEIGHT/2;
+    p2.x = WIDTH*2/3; p2.y = HEIGHT*5/6;
+    p3.x = WIDTH*3/4; p3.y = 0;
+    rotate_point(&p1);
+    rotate_point(&p2);
+    rotate_point(&p3);
+
+    context_grad.c1 = PASTEL_RED;
+    context_grad.c2 = PASTEL_GREEN;
+    context_grad.min = 0;
+    context_grad.max = WIDTH;
+    pastel_fill_triangle(&canvas, &p1, &p2, &p3, shader_gradx);
 
   }
   return canvas.pixels;
+}
+
+int main () {
+  return 0;
 }
