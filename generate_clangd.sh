@@ -1,11 +1,12 @@
 #!/bin/sh
-echo "
+echo "\
 CompileFlags:
     Add: [-xc,
         -Wall,
         -Wextra,
         -std=c99,
-        -I$PASTEL_DIR]
+        -I$PASTEL_DIR,
+        -I$SDL_INCLUDE]
 ---
 If:
     PathMatch: pastel.h

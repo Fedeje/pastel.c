@@ -3,3 +3,4 @@ imgs/
 *.ppm
 test/diff/
 .clangd
+.profile
