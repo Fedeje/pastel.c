@@ -253,25 +253,30 @@ bool line_shader_example(void) {
 bool triangle_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
 
-  Color bg_color = BG_COLOR;
-  PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &bg_color);
+  Color color = BG_COLOR;
+  PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &color);
   pastel_fill(canvas, pastel_monochrome_shader, &context);
 
-  pastel_fill_triangle(canvas,
-                      0, HEIGHT / 2,
-                      (WIDTH-1)/2, HEIGHT-1,
-                      (2*WIDTH)/3, 0,
-                      PASTEL_RED);
-  pastel_fill_triangle(canvas,
-                      0, HEIGHT/4,
-                      (2*WIDTH)/3, (5*HEIGHT)/6,
-                      (3*WIDTH)/4, (2*HEIGHT)/3,
-                      PASTEL_GREEN);
-  pastel_fill_triangle(canvas,
-                      (2*WIDTH)/3, HEIGHT/4,
-                      WIDTH-1, HEIGHT/2,
-                      (4*WIDTH)/5, (3*HEIGHT)/4,
-                      PASTEL_BLUE);
+  Vec2i p1, p2, p3;
+
+  color = PASTEL_RED;
+  p1.x = 0; p1.y = HEIGHT/2;
+  p2.x = (WIDTH-1)/2; p2.y = HEIGHT-1;
+  p3.x = (2*WIDTH)/3; p3.y = 0;
+  pastel_fill_triangle(canvas, &p1, &p2, &p3, pastel_monochrome_shader, &context);
+
+  color = PASTEL_GREEN;
+  p1.x = 0; p1.y = HEIGHT/4;
+  p2.x = (2*WIDTH)/3; p2.y = (5*HEIGHT)/6;
+  p3.x = (3*WIDTH)/4; p3.y = (2*HEIGHT)/3;
+  pastel_fill_triangle(canvas, &p1, &p2, &p3, pastel_monochrome_shader, &context);
+
+  color = PASTEL_BLUE;
+  p1.x = (2*WIDTH)/3; p1.y = HEIGHT/4;
+  p2.x = WIDTH-1; p2.y = HEIGHT/2;
+  p3.x = (4*WIDTH)/5; p3.y = (3*HEIGHT)/4;
+  pastel_fill_triangle(canvas, &p1, &p2, &p3, pastel_monochrome_shader, &context);
+
   const char* file_path = IMGS_DIR_PATH"/triangle_example.png";
   printf("Generated image %s\n", file_path);
   if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
