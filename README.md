@@ -3,8 +3,12 @@
 <a href="https://github.com/lmontaut/pastel.c/"><img src="./assets/pastel.png"></a>
 </p>
 
-# Install
-For the example that require SDL, please install SDL somewhere on your system.
+# Dependencies (optional)
+Only certain examples use SDL or compile to wasm.
+The rest only use `pastel.h`.
+
+## SDL examples
+For the examples that require SDL, please install SDL somewhere on your system.
 Check below [how to install SDL](#SDL-install).
 
 If you installed SDL locally (under your home, not `/usr/lib`),
@@ -30,6 +34,7 @@ $ source .profile
 
 to have these variables defined in your shell session.
 
+## WASM examples
 For the wasm example, make sure `wasm-ld` is installed.
 On linux run:
 
@@ -58,7 +63,7 @@ For the wasm examples:
 ```console
 $ python -m http.server 1234
 ```
-and to `http://localhost:1234/`.
+and go to `http://localhost:1234/`.
 
 # SDL install
 Get a release of SDL [here](https://www.libsdl.org/).
