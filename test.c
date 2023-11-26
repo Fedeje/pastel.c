@@ -130,9 +130,19 @@ void test_fill_circle(void) {
   PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &color);
   pastel_fill(canvas, pastel_monochrome_shader, &context);
 
-  pastel_fill_circle(canvas, 0, 0, 40, PASTEL_RED);
-  pastel_fill_circle(canvas, WIDTH / 2, HEIGHT / 2, 45, PASTEL_GREEN);
-  pastel_fill_circle(canvas, WIDTH, HEIGHT, 60, PASTEL_BLUE);
+  Vec2i pos;
+
+  color = PASTEL_RED;
+  pos.x = 0; pos.y = 0;
+  pastel_fill_circle(canvas, &pos, 40, pastel_monochrome_shader, &context);
+
+  color = PASTEL_GREEN;
+  pos.x = WIDTH/2; pos.y = HEIGHT/2;
+  pastel_fill_circle(canvas, &pos, 45, pastel_monochrome_shader, &context);
+
+  color = PASTEL_BLUE;
+  pos.x = WIDTH; pos.y = HEIGHT;
+  pastel_fill_circle(canvas, &pos, 60, pastel_monochrome_shader, &context);
 }
 
 void test_draw_line(void) {

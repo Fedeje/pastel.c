@@ -4,7 +4,11 @@
 #define WIDTH 800
 #define HEIGHT 600
 #define PI 3.1416
-static uint32_t pixels[WIDTH * HEIGHT];
+static Color pixels[WIDTH * HEIGHT];
+static Color color_black = PASTEL_BLACK;
+static PastelShaderContext bg_context = {0, 0, 0, 0, &color_black};
+static Color color_red = PASTEL_RED;
+static PastelShaderContext triangle_context = {0, 0, 0, 0, &color_red};
 
 static float angle = 0.0;
 static float freq = 0.1;
@@ -23,13 +27,13 @@ void rotate_point(int* x_, int* y_) {
   *y_ = (sinf(theta)*norm + (float)HEIGHT/2);
 }
 
-uint32_t* render(float dt) {
+Color* render(float dt) {
   angle += dt * (2*PI)*freq;
   if (angle > 2*PI) angle -= 2*PI;
 
-  PastelCanvas canvas = pastel_create_canvas(pixels, WIDTH, HEIGHT);
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
   {
-    pastel_fill(canvas, PASTEL_BLACK);
+    pastel_fill(canvas, pastel_monochrome_shader, &bg_context);
     int x0 = 0; int y0 = HEIGHT/2;
     int x1 = WIDTH*2/3; int y1 = HEIGHT*5/6;
     int x2 = WIDTH*3/4; int y2 = 0;

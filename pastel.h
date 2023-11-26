@@ -130,7 +130,7 @@ PASTELDEF void pastel_fill_rect(PastelCanvas canvas, const Vec2i* pos, const Vec
 
 // @brief Fill a circle with a given color.
 // A circle has center (x0, y0) and radius r.
-PASTELDEF void pastel_fill_circle(PastelCanvas canvas, int x0, int y0, size_t r, Color color);
+PASTELDEF void pastel_fill_circle(PastelCanvas canvas, const Vec2i* pos, size_t r, PASTEL_SHADER(shader), PastelShaderContext* context);
 
 // @brief Draw a line with a given color.
 // A line starts at (x0, y0) and ends at (x1, y1).
@@ -207,18 +207,21 @@ PASTELDEF void pastel_fill_rect(PastelCanvas canvas, const Vec2i* pos, const Vec
   }
 }
 
-PASTELDEF void pastel_fill_circle(PastelCanvas canvas, int x0, int y0, size_t r, Color color) {
-  int x0_aabb = x0 - r;
-  int y0_aabb = y0 - r;
+PASTELDEF void pastel_fill_circle(PastelCanvas canvas, const Vec2i* pos, size_t r, PASTEL_SHADER(shader), PastelShaderContext* context) {
+  int x0_aabb = pos->x - r;
+  int y0_aabb = pos->y - r;
   int r2 = (int)(r * r);
   for (int y = y0_aabb; y <= y0_aabb + 2 * (int)r; ++y) {
     if (0 <= y && y < (int)canvas.height) {
-      int dist_to_center_y2 = (y - y0) * (y - y0);
+      int dist_to_center_y2 = (y - pos->y) * (y - pos->y);
       for (int x = x0_aabb; x <= x0_aabb + 2 * (int)r; ++x) {
         if (0 <= x && x < (int)canvas.width) {
-          int dist_to_center_x2 = (x - x0) * (x - x0);
+          int dist_to_center_x2 = (x - pos->x) * (x - pos->x);
           if ((dist_to_center_x2 + dist_to_center_y2) <= r2) {
+            context->x = x; context->y = y;
+            Color color = shader(context);
             PASTEL_PIXEL(canvas, x, y) =  color;
+
           }
         }
       }

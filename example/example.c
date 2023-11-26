@@ -117,11 +117,13 @@ bool circle_example(void) {
   // initialize buffer with bg color
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
 
-  Color bg_color = BG_COLOR;
-  PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &bg_color);
+  Color color = BG_COLOR;
+  PastelShaderContext context = pastel_shader_context_create(0, 0, 0, 0, &color);
   pastel_fill(canvas, pastel_monochrome_shader, &context);
 
-  pastel_fill_circle(canvas, WIDTH / 2, HEIGHT / 2, 25, FG_COLOR);
+  color = FG_COLOR;
+  Vec2i pos = {WIDTH/2, HEIGHT/2};
+  pastel_fill_circle(canvas, &pos, 25, pastel_monochrome_shader, &context);
   const char* file_path = IMGS_DIR_PATH"/circle_example.png";
   printf("Generated image %s\n", file_path);
   if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
