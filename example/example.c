@@ -14,8 +14,8 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
-#define PASTEL_IMPLEMENTATION
-#include "pastel.h"
+#define PASTEL_TEST_IMPLEMENTATION
+#include "test.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "third-party/stb_image_write.h"
 
@@ -38,6 +38,15 @@ static Color pixels[HEIGHT * WIDTH];
 // Hex color: 0xAABBGGRR
 #define BG_COLOR PASTEL_BLACK
 #define FG_COLOR PASTEL_RED
+
+bool save_canvas_to_png(const PastelCanvas* canvas, const char* file_path) {
+  printf("Generated image %s\n", file_path);
+  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas->pixels, WIDTH*sizeof(Color))) {
+      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
+      return false;
+  }
+  return true;
+}
 
 bool corners_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
@@ -68,13 +77,8 @@ bool corners_example(void) {
   pastel_fill_rect(canvas, &pos, &dim, shader);
 
   // Save to png
-  const char* file_path = IMGS_DIR_PATH"/corners_examples.png";
-  printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
-      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
-      return false;
-  }
-  return true;
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/corners_examples.png");
+  return ok;
 }
 
 bool checker_example(void) {
@@ -107,14 +111,18 @@ bool checker_example(void) {
     }
   }
 
-  const char* file_path = IMGS_DIR_PATH"/checker_example.png";
-  printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
-      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
-      return false;
-  }
-  return true;
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/checker_example.png");
+  return ok;
 }
+
+bool rect_example(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_fill_rects(&canvas);
+
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/rect_example.png");
+  return ok;
+}
+
 
 bool circle_example(void) {
   // initialize buffer with bg color
@@ -129,207 +137,49 @@ bool circle_example(void) {
   context.color = FG_COLOR;
   Vec2i pos = {WIDTH/2, HEIGHT/2};
   pastel_fill_circle(canvas, &pos, 25, shader);
-  const char* file_path = IMGS_DIR_PATH"/circle_example.png";
-  printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
-      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
-      return false;
-  }
-  return true;
+
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/circle_example.png");
+  return ok;
+}
+
+bool multi_circles_example(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_fill_circles(&canvas);
+
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/multi_circles_example.png");
+  return ok;
 }
 
 bool line_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_draw_lines(&canvas);
 
-  PastelShaderContextMonochrome context;
-  PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-
-  context.color = BG_COLOR;
-  pastel_fill(canvas, shader);
-
-  Vec2i p1, p2;
-
-  //
-  // Side lines
-  context.color = PASTEL_RED;
-  p1.x = 0; p1.y = 0;
-  p2.x = 0; p2.y = HEIGHT-1;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  p1.x = WIDTH-1; p1.y = 0;
-  p2.x = WIDTH-1; p2.y = HEIGHT-1;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  //
-  // Middle lines
-  context.color = PASTEL_GREEN;
-  p1.x = WIDTH/2; p1.y = HEIGHT-1;
-  p2.x = WIDTH/2; p2.y = 0;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  p1.x = 0; p1.y = HEIGHT/2;
-  p2.x = WIDTH-1; p2.y = HEIGHT/2;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  //
-  // Diagonal lines
-  context.color = PASTEL_BLUE;
-  p1.x = 0; p1.y = 0;
-  p2.x = WIDTH-1; p2.y = HEIGHT-1;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  p1.x = 0; p1.y = HEIGHT-1;
-  p2.x = WIDTH-1; p2.y = 0;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  const char* file_path = IMGS_DIR_PATH"/line_example.png";
-  printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
-      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
-      return false;
-  }
-  return true;
-}
-
-typedef struct {
-  Color* colors;
-  size_t color_index;
-  size_t count;
-} ContextLineThreeColors;
-
-// @param `context` is a ptr to `ContextLineThreeColors`
-PASTELDEF Color line_shader_func1(int x, int y, void* context) {
-  PASTEL_UNUSED(x); PASTEL_UNUSED(y);
-  ContextLineThreeColors* _context = (ContextLineThreeColors*)context;
-  if (_context->count == 10) {
-    _context->color_index++;
-    if (_context->color_index > 2) _context->color_index = 0;
-    _context->count = 0;
-  } else {
-    _context->count++;
-  }
-  return _context->colors[_context->color_index];
-}
-
-typedef struct {
-  Color c1;
-  Color c2;
-} ContextTwoColors;
-
-// @param `context` is a ptr to `ContextTwoColors`
-PASTELDEF Color line_shader_func2(int x, int y, void* context) {
-  PASTEL_UNUSED(y);
-  ContextTwoColors* _context = (ContextTwoColors*) context;
-  if (x < WIDTH/2) {
-    return _context->c1; // red
-  }
-  return _context->c2; // green
-}
-
-// @param `context` is a ptr to `ContextTwoColors`
-PASTELDEF Color line_shader_func3(int x, int y, void* context) {
-  PASTEL_UNUSED(x);
-  ContextTwoColors* _context = (ContextTwoColors*) context;
-  if (y < HEIGHT/2) {
-    return _context->c1; // blue
-  }
-  return _context->c2; // yellow
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/line_example.png");
+  return ok;
 }
 
 bool line_shader_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_draw_lines_with_shaders(&canvas);
 
-  PastelShaderContextMonochrome mono_context;
-  PastelShader mono_shader = {pastel_shader_func_monochrome, &mono_context};
-
-  mono_context.color = BG_COLOR;
-  pastel_fill(canvas, mono_shader);
-
-
-  Vec2i p1, p2;
-
-  //
-  // Middle lines
-  Color colors[3] = { PASTEL_RED, PASTEL_GREEN, PASTEL_BLUE };
-  ContextLineThreeColors context_middle = {colors, 0, 0};
-  PastelShader shader_middle = {line_shader_func1, &context_middle};
-
-  p1.x = WIDTH/2; p1.y = HEIGHT-1;
-  p2.x = WIDTH/2; p2.y = 0;
-  pastel_draw_line(canvas, &p1, &p2, shader_middle);
-
-  p1.x = 0; p1.y = HEIGHT/2;
-  p2.x = WIDTH-1; p2.y = HEIGHT/2;
-  pastel_draw_line(canvas, &p1, &p2, shader_middle);
-
-  //
-  // Diagonal lines
-  ContextTwoColors context_diagonal;
-  PastelShader shader_diagonal = {line_shader_func2, &context_diagonal};
-
-  context_diagonal.c1 = PASTEL_RED; context_diagonal.c2 = PASTEL_GREEN;
-  p1.x = 0; p1.y = HEIGHT-1;
-  p2.x = WIDTH-1; p2.y = 0;
-  pastel_draw_line(canvas, &p1, &p2, shader_diagonal);
-
-  context_diagonal.c1 = PASTEL_BLUE; context_diagonal.c2 = PASTEL_YELLOW;
-  shader_diagonal.run = line_shader_func3;
-  p1.x = 0; p1.y = 0;
-  p2.x = WIDTH-1; p2.y = HEIGHT-1;
-  pastel_draw_line(canvas, &p1, &p2, shader_diagonal);
-
-  const char* file_path = IMGS_DIR_PATH"/line_shader_example.png";
-  printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
-      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
-      return false;
-  }
-  return true;
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/line_shader_example.png");
+  return ok;
 }
 
 bool triangle_example(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_fill_triangles(&canvas);
 
-  PastelShaderContextMonochrome context;
-  PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = BG_COLOR;
-  pastel_fill(canvas, shader);
-
-  Vec2i p1, p2, p3;
-
-  context.color = PASTEL_RED;
-  p1.x = 0; p1.y = HEIGHT/2;
-  p2.x = (WIDTH-1)/2; p2.y = HEIGHT-1;
-  p3.x = (2*WIDTH)/3; p3.y = 0;
-  pastel_fill_triangle(canvas, &p1, &p2, &p3, shader);
-
-  context.color = PASTEL_GREEN;
-  p1.x = 0; p1.y = HEIGHT/4;
-  p2.x = (2*WIDTH)/3; p2.y = (5*HEIGHT)/6;
-  p3.x = (3*WIDTH)/4; p3.y = (2*HEIGHT)/3;
-  pastel_fill_triangle(canvas, &p1, &p2, &p3, shader);
-
-  context.color = PASTEL_BLUE;
-  p1.x = (2*WIDTH)/3; p1.y = HEIGHT/4;
-  p2.x = WIDTH-1; p2.y = HEIGHT/2;
-  p3.x = (4*WIDTH)/5; p3.y = (3*HEIGHT)/4;
-  pastel_fill_triangle(canvas, &p1, &p2, &p3, shader);
-
-  const char* file_path = IMGS_DIR_PATH"/triangle_example.png";
-  printf("Generated image %s\n", file_path);
-  if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, canvas.pixels, WIDTH*sizeof(Color))) {
-      fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
-      return false;
-  }
-  return true;
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/triangle_example.png");
+  return ok;
 }
 
 int main (void) {
   if (!corners_example()) return -1;
   if (!checker_example()) return -1;
+  if (!rect_example()) return -1;
   if (!circle_example()) return -1;
+  if (!multi_circles_example()) return -1;
   if (!line_example()) return -1;
   if (!line_shader_example()) return -1;
   if (!triangle_example()) return -1;

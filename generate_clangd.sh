@@ -13,6 +13,11 @@ CompileFlags:
     Add: [-DPASTEL_IMPLEMENTATION]
 ---
 If:
+    PathMatch: test.h
+CompileFlags:
+    Add: [-DPASTEL_TEST_IMPLEMENTATION]
+---
+If:
     PathMatch: third-party/stb_image.h
 CompileFlags:
     Add: [-DSTB_IMAGE_IMPLEMENTATION]

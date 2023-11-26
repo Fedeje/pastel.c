@@ -7,8 +7,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-#define PASTEL_IMPLEMENTATION
-#include "pastel.h"
+#define PASTEL_TEST_IMPLEMENTATION
+#include "test.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "third-party/stb_image_write.h"
 #define STB_IMAGE_IMPLEMENTATION
@@ -100,223 +100,35 @@ typedef struct {
 
 void test_fill_rect(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-
-  PastelShaderContextMonochrome context;
-  PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = PASTEL_BLACK;
-  pastel_fill(canvas, shader);
-
-  Vec2i pos; Vec2ui dim;
-
-  context.color = PASTEL_BLUE;
-  pos.x = 0; pos.y = 0;
-  dim.x = 80; dim.y = 40;
-  pastel_fill_rect(canvas, &pos, &dim, shader);
-
-  context.color = PASTEL_RED;
-  pos.x = WIDTH-60; pos.y = HEIGHT-60;
-  dim.x = 60; dim.y = 60;
-  pastel_fill_rect(canvas, &pos, &dim, shader);
-
-  context.color = PASTEL_GREEN;
-  pos.x = (WIDTH-60)/2; pos.y = (HEIGHT-60)/2;
-  dim.x = 80; dim.y = 60;
-  pastel_fill_rect(canvas, &pos, &dim, shader);
+  pastel_test_fill_rects(&canvas);
 }
 
 void test_fill_circle(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-
-  PastelShaderContextMonochrome context;
-  PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = PASTEL_BLACK;
-  pastel_fill(canvas, shader);
-
-  Vec2i pos;
-
-  context.color = PASTEL_RED;
-  pos.x = 0; pos.y = 0;
-  pastel_fill_circle(canvas, &pos, 40, shader);
-
-  context.color = PASTEL_GREEN;
-  pos.x = WIDTH/2; pos.y = HEIGHT/2;
-  pastel_fill_circle(canvas, &pos, 45, shader);
-
-  context.color = PASTEL_BLUE;
-  pos.x = WIDTH; pos.y = HEIGHT;
-  pastel_fill_circle(canvas, &pos, 60, shader);
+  pastel_test_fill_circles(&canvas);
 }
 
 void test_draw_line(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-
-  PastelShaderContextMonochrome context;
-  PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = PASTEL_BLACK;
-  pastel_fill(canvas, shader);
-
-  Vec2i p1, p2;
-
-  //
-  // Side lines
-  context.color = PASTEL_RED;
-  p1.x = 0; p1.y = 0;
-  p2.x = 0; p2.y = HEIGHT-1;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  p1.x = WIDTH-1; p1.y = 0;
-  p2.x = WIDTH-1; p2.y = HEIGHT-1;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  //
-  // Middle lines
-  context.color = PASTEL_GREEN;
-  p1.x = WIDTH/2; p1.y = HEIGHT-1;
-  p2.x = WIDTH/2; p2.y = 0;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  p1.x = 0; p1.y = HEIGHT/2;
-  p2.x = WIDTH-1; p2.y = HEIGHT/2;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  //
-  // Diagonal lines
-  context.color = PASTEL_BLUE;
-  p1.x = 0; p1.y = 0;
-  p2.x = WIDTH-1; p2.y = HEIGHT-1;
-  pastel_draw_line(canvas, &p1, &p2, shader);
-
-  p1.x = 0; p1.y = HEIGHT-1;
-  p2.x = WIDTH-1; p2.y = 0;
-  pastel_draw_line(canvas, &p1, &p2, shader);
+  pastel_test_draw_lines(&canvas);
 }
 
 void test_fill_triangle(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-
-  PastelShaderContextMonochrome context;
-  PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = PASTEL_BLACK;
-  pastel_fill(canvas, shader);
-
-  Vec2i p1, p2, p3;
-
-  context.color = PASTEL_RED;
-  p1.x = 0; p1.y = HEIGHT/2;
-  p2.x = (WIDTH-1)/2; p2.y = HEIGHT-1;
-  p3.x = (2*WIDTH)/3; p3.y = 0;
-  pastel_fill_triangle(canvas, &p1, &p2, &p3, shader);
-
-  context.color = PASTEL_GREEN;
-  p1.x = 0; p1.y = HEIGHT/4;
-  p2.x = (2*WIDTH)/3; p2.y = (5*HEIGHT)/6;
-  p3.x = (3*WIDTH)/4; p3.y = (2*HEIGHT)/3;
-  pastel_fill_triangle(canvas, &p1, &p2, &p3, shader);
-
-  context.color = PASTEL_BLUE;
-  p1.x = (2*WIDTH)/3; p1.y = HEIGHT/4;
-  p2.x = WIDTH-1; p2.y = HEIGHT/2;
-  p3.x = (4*WIDTH)/5; p3.y = (3*HEIGHT)/4;
-  pastel_fill_triangle(canvas, &p1, &p2, &p3, shader);
-}
-
-typedef struct {
-  Color* colors;
-  size_t color_index;
-  size_t count;
-} ContextLineThreeColors;
-
-// @param `context` is a ptr to `ContextLineThreeColors`
-PASTELDEF Color line_shader_func1(int x, int y, void* context) {
-  PASTEL_UNUSED(x); PASTEL_UNUSED(y);
-  ContextLineThreeColors* _context = (ContextLineThreeColors*)context;
-  if (_context->count == 10) {
-    _context->color_index++;
-    if (_context->color_index > 2) _context->color_index = 0;
-    _context->count = 0;
-  } else {
-    _context->count++;
-  }
-  return _context->colors[_context->color_index];
-}
-
-typedef struct {
-  Color c1;
-  Color c2;
-} ContextTwoColors;
-
-// @param `context` is a ptr to `ContextTwoColors`
-PASTELDEF Color line_shader_func2(int x, int y, void* context) {
-  PASTEL_UNUSED(y);
-  ContextTwoColors* _context = (ContextTwoColors*) context;
-  if (x < WIDTH/2) {
-    return _context->c1; // red
-  }
-  return _context->c2; // green
-}
-
-// @param `context` is a ptr to `ContextTwoColors`
-PASTELDEF Color line_shader_func3(int x, int y, void* context) {
-  PASTEL_UNUSED(x);
-  ContextTwoColors* _context = (ContextTwoColors*) context;
-  if (y < HEIGHT/2) {
-    return _context->c1; // blue
-  }
-  return _context->c2; // yellow
+  pastel_test_draw_lines_with_shaders(&canvas);
 }
 
 void test_draw_line_with_shader(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
-
-  PastelShaderContextMonochrome mono_context;
-  PastelShader mono_shader = {pastel_shader_func_monochrome, &mono_context};
-
-  mono_context.color = PASTEL_BLACK;
-  pastel_fill(canvas, mono_shader);
-
-  Vec2i p1, p2;
-
-  //
-  // Middle lines
-  Color colors[3] = { PASTEL_RED, PASTEL_GREEN, PASTEL_BLUE };
-  ContextLineThreeColors context_middle = {colors, 0, 0};
-  PastelShader shader_middle = {line_shader_func1, &context_middle};
-
-  p1.x = WIDTH/2; p1.y = HEIGHT-1;
-  p2.x = WIDTH/2; p2.y = 0;
-  pastel_draw_line(canvas, &p1, &p2, shader_middle);
-
-  p1.x = 0; p1.y = HEIGHT/2;
-  p2.x = WIDTH-1; p2.y = HEIGHT/2;
-  pastel_draw_line(canvas, &p1, &p2, shader_middle);
-
-  //
-  // Diagonal lines
-  ContextTwoColors context_diagonal;
-  PastelShader shader_diagonal = {line_shader_func2, &context_diagonal};
-
-  context_diagonal.c1 = PASTEL_RED; context_diagonal.c2 = PASTEL_GREEN;
-  p1.x = 0; p1.y = HEIGHT-1;
-  p2.x = WIDTH-1; p2.y = 0;
-  pastel_draw_line(canvas, &p1, &p2, shader_diagonal);
-
-  context_diagonal.c1 = PASTEL_BLUE; context_diagonal.c2 = PASTEL_YELLOW;
-  shader_diagonal.run = line_shader_func3;
-  p1.x = 0; p1.y = 0;
-  p2.x = WIDTH-1; p2.y = HEIGHT-1;
-  pastel_draw_line(canvas, &p1, &p2, shader_diagonal);
+  pastel_test_fill_triangles(&canvas);
 }
 
 TestCase test_cases[] = {
   DEFINE_TEST_CASE(test_fill_rect),
   DEFINE_TEST_CASE(test_fill_circle),
   DEFINE_TEST_CASE(test_draw_line),
-  DEFINE_TEST_CASE(test_draw_line_with_shader),
   DEFINE_TEST_CASE(test_fill_triangle),
+  DEFINE_TEST_CASE(test_draw_line_with_shader),
 };
 
 #define TESTS_CASES_COUNT (sizeof(test_cases) / sizeof(test_cases[0]))

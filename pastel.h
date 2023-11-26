@@ -52,6 +52,7 @@
 // and performs computation on the current pixel.
 // A shader is meant to be applied to every pixel of the image / every pixel of the object being rendered.
 // 
+// TODO: Concatenate headers of functions used both in test.c and example.c
 // TODO: Color gradient on canvas/rectangle
 // TODO: Rainbow triangle
 // TODO: SDL to have a window instead of png / web thingy
