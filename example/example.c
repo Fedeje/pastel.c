@@ -35,6 +35,7 @@ static Color pixels[HEIGHT * WIDTH];
 // on the stack.
 
 #define IMGS_DIR_PATH "./imgs"
+#define ASSETS_DIR_PATH "./assets"
 // Hex color: 0xAABBGGRR
 #define BG_COLOR PASTEL_BLACK
 #define FG_COLOR PASTEL_RED
@@ -194,8 +195,9 @@ bool example_circle_gradientx(void) {
 
   pastel_fill_circle(&canvas, &p, r, shader);
 
-  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/010_example_circle_gradientx.png");
-  return ok;
+  bool ok1 = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/010_example_circle_gradientx.png");
+  bool ok2 = save_canvas_to_png(&canvas, ASSETS_DIR_PATH"/pastel.png");
+  return ok1&ok2;
 }
 
 bool example_alpha_blending(void) {
