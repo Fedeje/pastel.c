@@ -61,7 +61,6 @@
 // TODO: z-buffer
 // TODO: super-sampling for lines
 // TODO: super-sampling for triangles
-// TODO: alpha blending
 // TODO: font
 // TODO: terminal rendering
 // TODO: bezier curves
