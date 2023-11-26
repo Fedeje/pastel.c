@@ -50,13 +50,10 @@ bool save_canvas_to_png(const PastelCanvas* canvas, const char* file_path) {
 
 bool example_corners(void) {
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  __fill_bg(&canvas, BG_COLOR);
 
   PastelShaderContextMonochrome context;
   PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  // Draw background
-  context.color = BG_COLOR;
-  pastel_fill(&canvas, shader);
 
   // Draw corners
   context.color = FG_COLOR;
@@ -84,12 +81,10 @@ bool example_corners(void) {
 bool example_checker(void) {
   // initialize buffer with bg color
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  __fill_bg(&canvas, BG_COLOR);
 
   PastelShaderContextMonochrome context;
   PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = BG_COLOR;
-  pastel_fill(&canvas, shader);
 
   size_t cols = 10;
   size_t rect_width = WIDTH / cols;
@@ -127,12 +122,10 @@ bool example_rect(void) {
 bool example_circle(void) {
   // initialize buffer with bg color
   PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  __fill_bg(&canvas, BG_COLOR);
 
   PastelShaderContextMonochrome context;
   PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = BG_COLOR;
-  pastel_fill(&canvas, shader);
 
   context.color = FG_COLOR;
   Vec2i pos = {WIDTH/2, HEIGHT/2};

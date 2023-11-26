@@ -20,13 +20,18 @@ void pastel_test_gradienty(PastelCanvas* canvas);
 #endif // PASTEL_TEST_H_
 
 #ifdef PASTEL_TEST_IMPLEMENTATION
+
+void __fill_bg(PastelCanvas* canvas, Color color) {
+  PastelShaderContextMonochrome context = { color };
+  PastelShader shader = {pastel_shader_func_monochrome, &context};
+  pastel_fill(canvas, shader);
+}
+
 void pastel_test_fill_rects(PastelCanvas* canvas) {
+  __fill_bg(canvas, PASTEL_BLACK);
 
   PastelShaderContextMonochrome context;
   PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = PASTEL_BLACK;
-  pastel_fill(canvas, shader);
 
   Vec2i pos; Vec2ui dim;
 
@@ -47,11 +52,10 @@ void pastel_test_fill_rects(PastelCanvas* canvas) {
 }
 
 void pastel_test_fill_circles(PastelCanvas* canvas) {
+  __fill_bg(canvas, PASTEL_BLACK);
+
   PastelShaderContextMonochrome context;
   PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = PASTEL_BLACK;
-  pastel_fill(canvas, shader);
 
   Vec2i pos;
 
@@ -69,11 +73,10 @@ void pastel_test_fill_circles(PastelCanvas* canvas) {
 }
 
 void pastel_test_draw_lines(PastelCanvas* canvas) {
+  __fill_bg(canvas, PASTEL_BLACK);
+
   PastelShaderContextMonochrome context;
   PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = PASTEL_BLACK;
-  pastel_fill(canvas, shader);
 
   Vec2i p1, p2;
 
@@ -160,11 +163,7 @@ PASTELDEF Color line_shader_func1(int x, int y, void* context) {
 }
 
 void pastel_test_draw_lines_with_shaders(PastelCanvas* canvas) {
-  PastelShaderContextMonochrome mono_context;
-  PastelShader mono_shader = {pastel_shader_func_monochrome, &mono_context};
-
-  mono_context.color = PASTEL_BLACK;
-  pastel_fill(canvas, mono_shader);
+  __fill_bg(canvas, PASTEL_BLACK);
 
   Vec2i p1, p2;
 
@@ -202,11 +201,10 @@ void pastel_test_draw_lines_with_shaders(PastelCanvas* canvas) {
 }
 
 void pastel_test_fill_triangles(PastelCanvas* canvas) {
+  __fill_bg(canvas, PASTEL_BLACK);
+
   PastelShaderContextMonochrome context;
   PastelShader shader = {pastel_shader_func_monochrome, &context};
-
-  context.color = PASTEL_BLACK;
-  pastel_fill(canvas, shader);
 
   Vec2i p1, p2, p3;
 
