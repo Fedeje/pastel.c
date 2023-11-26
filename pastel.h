@@ -147,8 +147,6 @@ PASTELDEF void pastel_fill_circle(PastelCanvas canvas, const Vec2i* p, size_t r,
 // A line starts at (x0, y0) and ends at (x1, y1).
 // @param p1 and p2 the two points of the line segment.
 PASTELDEF void pastel_draw_line(PastelCanvas canvas, const Vec2i* p1, const Vec2i* p2, PASTEL_SHADER(shader), PastelShaderContext* context);
-// Deprecated. Use pastel_draw_line instead.
-PASTELDEF void pastel_draw_line2(PastelCanvas canvas, const Vec2i* p1, const Vec2i* p2, PASTEL_SHADER(shader), PastelShaderContext* context);
 
 // @brief Fill a triangle with a given color.
 // A triangle is 3 points (x0, y0), (x1, y1) and (x2, y2)
