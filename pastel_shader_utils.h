@@ -81,7 +81,7 @@ PASTELDEF Color __pastel_compute_color_grad1d(int v, int vmin, int vmax, Color c
   Color c2_alpha = PASTEL_ALPHA_CHANNEL(c2);
   Color c_alpha  = ((vmax-v)*c1_alpha + (v-vmin)*c2_alpha)/(vmax-vmin);
 
-  Color color = PASTEL_TO_RGBA(c_red, c_green, c_blue, c_alpha);
+  Color color = PASTEL_RGBA(c_red, c_green, c_blue, c_alpha);
   return color;
 }
 
