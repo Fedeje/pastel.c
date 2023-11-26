@@ -174,6 +174,22 @@ bool triangle_example(void) {
   return ok;
 }
 
+bool gradientx_example(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_gradientx(&canvas);
+
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/gradientx_example.png");
+  return ok;
+}
+
+bool gradienty_example(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_gradienty(&canvas);
+
+  bool ok = save_canvas_to_png(&canvas, IMGS_DIR_PATH"/gradienty_example.png");
+  return ok;
+}
+
 int main (void) {
   if (!corners_example()) return -1;
   if (!checker_example()) return -1;
@@ -183,5 +199,7 @@ int main (void) {
   if (!line_example()) return -1;
   if (!line_shader_example()) return -1;
   if (!triangle_example()) return -1;
+  if (!gradientx_example()) return -1;
+  if (!gradienty_example()) return -1;
   return 0;
 }

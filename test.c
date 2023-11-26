@@ -123,12 +123,24 @@ void test_draw_line_with_shader(void) {
   pastel_test_fill_triangles(&canvas);
 }
 
+void test_gradientx(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_gradientx(&canvas);
+}
+
+void test_gradienty(void) {
+  PastelCanvas canvas = pastel_canvas_create(pixels, WIDTH, HEIGHT);
+  pastel_test_gradienty(&canvas);
+}
+
 TestCase test_cases[] = {
   DEFINE_TEST_CASE(test_fill_rect),
   DEFINE_TEST_CASE(test_fill_circle),
   DEFINE_TEST_CASE(test_draw_line),
   DEFINE_TEST_CASE(test_fill_triangle),
   DEFINE_TEST_CASE(test_draw_line_with_shader),
+  DEFINE_TEST_CASE(test_gradientx),
+  DEFINE_TEST_CASE(test_gradienty),
 };
 
 #define TESTS_CASES_COUNT (sizeof(test_cases) / sizeof(test_cases[0]))

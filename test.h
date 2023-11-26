@@ -14,6 +14,8 @@ void pastel_test_fill_circles(PastelCanvas* canvas);
 void pastel_test_draw_lines(PastelCanvas* canvas);
 void pastel_test_draw_lines_with_shaders(PastelCanvas* canvas);
 void pastel_test_fill_triangles(PastelCanvas* canvas);
+void pastel_test_gradientx(PastelCanvas* canvas);
+void pastel_test_gradienty(PastelCanvas* canvas);
 
 #endif // PASTEL_TEST_H_
 
@@ -227,6 +229,19 @@ void pastel_test_fill_triangles(PastelCanvas* canvas) {
   p1.x = 0; p1.y = 0;
   p2.x = canvas->width-1; p2.y = canvas->height-1;
   pastel_draw_line(*canvas, &p1, &p2, shader_diagonal);
+}
+
+void pastel_test_gradientx(PastelCanvas* canvas) {
+  PastelShaderContextGradient1D context = { PASTEL_RED, PASTEL_GREEN, 0, canvas->width };
+  PastelShader shader = { pastel_shader_func_gradient1dx, &context };
+  pastel_fill(*canvas, shader);
+
+}
+
+void pastel_test_gradienty(PastelCanvas* canvas) {
+  PastelShaderContextGradient1D context = { PASTEL_RED, PASTEL_GREEN, 0, canvas->height };
+  PastelShader shader = { pastel_shader_func_gradient1dy, &context };
+  pastel_fill(*canvas, shader);
 }
 
 #endif // PASTEL_TEST_IMPLEMENTATION
