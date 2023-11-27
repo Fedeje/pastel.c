@@ -24,6 +24,11 @@ CompileFlags:
     Add: [-DPASTEL_SHADER_UTILS_IMPLEMENTATION]
 ---
 If:
+    PathMatch: example/triangle.c
+CompileFlags:
+    Add: [-DPLATFORM_SDL]
+---
+If:
     PathMatch: third-party/stb_image.h
 CompileFlags:
     Add: [-DSTB_IMAGE_IMPLEMENTATION]

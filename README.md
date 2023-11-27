@@ -66,6 +66,7 @@ $ python -m http.server 1234
 and go to `http://localhost:1234/`.
 
 # SDL install
+Full build instructions [here](https://wiki.libsdl.org/SDL2/Installation).
 Get a release of SDL [here](https://www.libsdl.org/).
 Download it, unpack it somewhere.
 If you want to install SDL locally:
