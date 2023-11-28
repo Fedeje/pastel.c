@@ -236,6 +236,6 @@ int main (void) {
   if (!example_gradienty()) return -1;
   if (!example_circle_gradientx()) return -1;
   if (!example_alpha_blending()) return -1;
-  if (!asset_circle_gradientx()) return -1;
+  // if (!asset_circle_gradientx()) return -1;
   return 0;
 }

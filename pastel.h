@@ -95,7 +95,7 @@ typedef uint32_t Color;
 #define PASTEL_GREEN_CHANNEL(color) (((color)&0x0000FF00)>>(8*1))
 #define PASTEL_BLUE_CHANNEL(color)  (((color)&0x00FF0000)>>(8*2))
 #define PASTEL_ALPHA_CHANNEL(color) (((color)&0xFF000000)>>(8*3))
-#define PASTEL_RGBA(r, g, b, a)  (((a)&0xFF)<<(8*3))|(((b)&0xFF)<<(8*2))|(((g)&0xFF)<<(8*1))|(((r)&0xFF)<<(8*0));
+#define PASTEL_RGBA(r, g, b, a)     (((a)&0xFF)<<(8*3))|(((b)&0xFF)<<(8*2))|(((g)&0xFF)<<(8*1))|(((r)&0xFF)<<(8*0));
 
 #define PASTEL_SHADER(shader) Color (*(shader))(PastelShaderContext*)
 #define PASTEL_SHADER_FUNC(shader) Color (*(shader))(void*)
@@ -216,10 +216,12 @@ PASTELDEF void pastel_blend_colors(Color* c1, Color c2) {
 
   Color c1a = PASTEL_ALPHA_CHANNEL(*c1);
   Color c2a = PASTEL_ALPHA_CHANNEL(c2);
+  Color ca = c2a*255 + c1a*(255-c2a);
 
-  c1r  = (c2r*c2a + c1r*(255-c2a))/255; if (c1r > 255) c1r = 255;
-  c1g  = (c2g*c2a + c1g*(255-c2a))/255; if (c1g > 255) c1g = 255;
-  c1b  = (c2b*c2a + c1b*(255-c2a))/255; if (c1b > 255) c1b = 255;
+  c1r  = (c2r*c2a*255 + c1r*c1a*(255-c2a))/ca; if (c1r > 255) c1r = 255;
+  c1g  = (c2g*c2a*255 + c1g*c1a*(255-c2a))/ca; if (c1g > 255) c1g = 255;
+  c1b  = (c2b*c2a*255 + c1b*c1a*(255-c2a))/ca; if (c1b > 255) c1b = 255;
+  c1a = ca/255; if (c1a > 255) c1a = 255;
   *c1 = PASTEL_RGBA(c1r, c1g, c1b, c1a);
 }
 
